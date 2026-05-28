@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Concert;
+use Illuminate\Http\Request;
+
+class PublicController extends Controller
+{
+    public function home(Request $request)
+    {
+        $concerts = $this->concertQuery($request)->limit(6)->get();
+        $featuredConcert = Concert::where('status', 'aktif')->where('is_featured', true)->first() ?? $concerts->first();
+
+        if ($featuredConcert && ! $concerts->contains('id', $featuredConcert->id)) {
+            $concerts = collect([$featuredConcert])->merge($concerts)->take(6);
+        }
+
+        return view('public.home', compact('concerts', 'featuredConcert'));
+    }
+
+    public function concerts(Request $request)
+    {
+        $concerts = $this->concertQuery($request)->paginate(9)->withQueryString();
+        return view('public.concerts', compact('concerts'));
+    }
+
+    public function show(Concert $concert)
+    {
+        $concert->load('ticketZones');
+        return view('public.concert-show', compact('concert'));
+    }
+
+    private function concertQuery(Request $request)
+    {
+        return Concert::query()
+            ->where('status', 'aktif')
+            ->when($request->q, fn ($query, $q) => $query->where(fn ($q2) => $q2->where('name', 'like', "%{$q}%")->orWhere('artist', 'like', "%{$q}%")))
+            ->when($request->venue, fn ($query, $venue) => $query->where('venue', 'like', "%{$venue}%"))
+            ->when($request->date, fn ($query, $date) => $query->whereDate('date', $date))
+            ->orderByDesc('is_featured')
+            ->latest('date');
+    }
+}

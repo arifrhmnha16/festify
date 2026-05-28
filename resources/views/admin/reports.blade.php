@@ -1,0 +1,4 @@
+@extends('layouts.admin', ['title' => 'Laporan', 'pageTitle' => 'Laporan'])
+@section('content')
+<section><div class="overflow-x-auto rounded-lg border bg-white"><table class="w-full text-left text-sm"><tr class="bg-neutral-100"><th class="p-3">Waktu</th><th>Petugas</th><th>Tipe</th><th>Hasil</th><th>Pesan</th><th>Aksi</th></tr>@foreach($histories as $history)<tr class="border-t"><td class="p-3">{{ $history->scanned_at->format('d M Y H:i') }}</td><td>{{ $history->officer->name }}</td><td>{{ $history->scan_type }}</td><td>{{ $history->scan_result }}</td><td>{{ $history->message }}</td><td><form method="post" action="{{ route('admin.reports.destroy',$history) }}">@csrf @method('delete')<button class="font-bold text-red-700">Hapus</button></form></td></tr>@endforeach</table></div><div class="mt-6">{{ $histories->links() }}</div></section>
+@endsection
