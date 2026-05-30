@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Models\Wristband;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
@@ -40,21 +41,39 @@ class AdminController extends Controller
         return view('admin.concerts', compact('concerts'));
     }
 
+    public function createConcert()
+    {
+        return view('admin.concert-create');
+    }
+
     public function storeConcert(Request $request)
     {
         $concert = Concert::create($this->concertData($request) + ['admin_id' => Auth::guard('admin')->id()]);
-        $this->createDefaultZones($concert);
-        return back()->with('success', 'Konser ditambahkan.');
+        $this->syncDefaultZones($concert);
+
+        return redirect()->route('admin.concerts')->with('success', 'Konser ditambahkan.');
+    }
+
+    public function editConcert(Concert $concert)
+    {
+        $concert->load('ticketZones');
+        return view('admin.concert-edit', compact('concert'));
     }
 
     public function updateConcert(Request $request, Concert $concert)
     {
         $concert->update($this->concertData($request, $concert));
-        return back()->with('success', 'Konser diperbarui.');
+        $this->syncDefaultZones($concert);
+
+        return redirect()->route('admin.concerts.edit', $concert)->with('success', 'Konser diperbarui.');
     }
 
     public function destroyConcert(Concert $concert)
     {
+        if ($concert->poster) {
+            Storage::disk('public')->delete($concert->poster);
+        }
+
         $concert->delete();
         return back()->with('success', 'Konser dihapus.');
     }
@@ -205,6 +224,11 @@ class AdminController extends Controller
         return view('admin.payments', [
             'payments' => Payment::with('order.user', 'order.concert', 'order.ticketZone')->latest()->paginate(12),
             'orders' => Order::doesntHave('payment')->with('user', 'concert')->latest()->get(),
+            'paymentStats' => [
+                'pending' => Payment::where('payment_status', 'pending')->count(),
+                'success' => Payment::where('payment_status', 'success')->count(),
+                'failed' => Payment::where('payment_status', 'failed')->count(),
+            ],
         ]);
     }
 
@@ -216,7 +240,9 @@ class AdminController extends Controller
             'payment_status' => ['required', 'in:pending,success,failed'],
         ]);
         $order = Order::findOrFail($data['order_id']);
-        Payment::create($data + ['total_amount' => $order->total_price, 'payment_date' => now()]);
+        $payment = Payment::create($data + ['total_amount' => $order->total_price, 'payment_date' => now()]);
+
+        $this->syncOrderAfterPayment($payment);
 
         return back()->with('success', 'Pembayaran ditambahkan.');
     }
@@ -227,19 +253,7 @@ class AdminController extends Controller
         $payment->update($data + ['payment_date' => now()]);
 
         if ($data['payment_status'] === 'success') {
-            $order = $payment->order()->with('concert', 'ticketZone')->first();
-            $order->update(['order_status' => 'paid']);
-            for ($i = $order->eTickets()->count(); $i < $order->ticket_quantity; $i++) {
-                $code = 'TIX-'.now()->format('ymd').'-'.Str::upper(Str::random(8));
-                ETicket::create([
-                    'order_id' => $order->id,
-                    'user_id' => $order->user_id,
-                    'concert_id' => $order->concert_id,
-                    'ticket_code' => $code,
-                    'ticket_qr_code' => $code,
-                    'issued_at' => now(),
-                ]);
-            }
+            $this->issueTickets($payment->order);
         } elseif ($data['payment_status'] === 'failed') {
             $payment->order->update(['order_status' => 'cancelled']);
         } else {
@@ -354,6 +368,38 @@ class AdminController extends Controller
         return back()->with('success', 'Riwayat scan dihapus.');
     }
 
+    private function syncOrderAfterPayment(Payment $payment): void
+    {
+        if ($payment->payment_status === 'success') {
+            $this->issueTickets($payment->order);
+            return;
+        }
+
+        if ($payment->payment_status === 'failed') {
+            $payment->order->update(['order_status' => 'cancelled']);
+            return;
+        }
+
+        $payment->order->update(['order_status' => 'pending']);
+    }
+
+    private function issueTickets(Order $order): void
+    {
+        $order->update(['order_status' => 'paid']);
+
+        for ($i = $order->eTickets()->count(); $i < $order->ticket_quantity; $i++) {
+            $code = 'TIX-'.now()->format('ymd').'-'.Str::upper(Str::random(8));
+            ETicket::create([
+                'order_id' => $order->id,
+                'user_id' => $order->user_id,
+                'concert_id' => $order->concert_id,
+                'ticket_code' => $code,
+                'ticket_qr_code' => $code,
+                'issued_at' => now(),
+            ]);
+        }
+    }
+
     private function concertData(Request $request, ?Concert $concert = null): array
     {
         $data = $request->validate([
@@ -366,11 +412,15 @@ class AdminController extends Controller
             'poster' => ['nullable', 'image', 'max:2048'],
             'price' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
-            'seat_zone' => ['nullable', 'string', 'max:80'],
             'status' => ['required', 'in:aktif,selesai,dibatalkan'],
         ]);
 
+        $data['seat_zone'] = 'Festival Tengah';
+
         if ($request->hasFile('poster')) {
+            if ($concert?->poster) {
+                Storage::disk('public')->delete($concert->poster);
+            }
             $data['poster'] = $request->file('poster')->store('posters', 'public');
         } elseif ($concert) {
             unset($data['poster']);
@@ -379,16 +429,20 @@ class AdminController extends Controller
         return $data;
     }
 
-    private function createDefaultZones(Concert $concert): void
+    private function syncDefaultZones(Concert $concert): void
     {
+        $frontStock = (int) floor($concert->stock * 0.3);
+        $middleStock = (int) floor($concert->stock * 0.45);
+        $backStock = max(0, $concert->stock - $frontStock - $middleStock);
+
         $zones = [
-            ['name' => 'Festival Depan', 'price' => (int) round($concert->price * 1.25), 'stock' => max(1, (int) floor($concert->stock * 0.3)), 'color' => '#dc2626', 'position' => 1],
-            ['name' => 'Festival Tengah', 'price' => $concert->price, 'stock' => max(1, (int) floor($concert->stock * 0.45)), 'color' => '#ea580c', 'position' => 2],
-            ['name' => 'Tribune Belakang', 'price' => (int) round($concert->price * 0.8), 'stock' => max(1, (int) ceil($concert->stock * 0.25)), 'color' => '#ca8a04', 'position' => 3],
+            ['name' => 'Festival Depan', 'price' => $concert->price + 10000, 'stock' => $frontStock, 'color' => '#dc2626', 'position' => 1],
+            ['name' => 'Festival Tengah', 'price' => $concert->price + 5000, 'stock' => $middleStock, 'color' => '#ea580c', 'position' => 2],
+            ['name' => 'Tribune Belakang', 'price' => $concert->price, 'stock' => $backStock, 'color' => '#ca8a04', 'position' => 3],
         ];
 
         foreach ($zones as $zone) {
-            $concert->ticketZones()->create($zone);
+            $concert->ticketZones()->updateOrCreate(['position' => $zone['position']], $zone);
         }
     }
 }

@@ -1,4 +1,71 @@
 @extends('layouts.admin', ['title' => 'Kelola Gelang', 'pageTitle' => 'Kelola Gelang'])
 @section('content')
-<section><form method="post" action="{{ route('admin.wristbands.store') }}" class="mb-6 grid gap-3 rounded-lg border bg-white p-5 md:grid-cols-3">@csrf<select name="e_ticket_id" class="rounded border px-3 py-2">@foreach($tickets as $ticket)<option value="{{ $ticket->id }}">{{ $ticket->ticket_code }} - {{ $ticket->user->name }}</option>@endforeach</select><select name="wristband_status" class="rounded border px-3 py-2"><option>aktif</option><option>sudah_masuk</option><option>invalid</option></select><button class="rounded bg-neutral-950 px-4 py-2 font-bold text-white">Tambah Gelang</button></form><div class="grid gap-3">@foreach($wristbands as $wristband)<div class="rounded-lg border bg-white p-4"><div class="flex flex-wrap items-center justify-between gap-3"><div><p class="font-mono">{{ $wristband->wristband_code }}</p><strong>{{ $wristband->concert->name }}</strong><p>{{ $wristband->eTicket->user->name }} - {{ $wristband->wristband_status }}</p></div><div class="flex flex-wrap gap-2"><form method="post" action="{{ route('admin.wristbands.update',$wristband) }}" class="flex gap-2">@csrf @method('put')<select name="wristband_status" class="rounded border px-3 py-2">@foreach(['aktif','sudah_masuk','invalid'] as $status)<option @selected($wristband->wristband_status===$status)>{{ $status }}</option>@endforeach</select><button class="rounded bg-orange-700 px-4 py-2 font-bold text-white">Simpan</button></form><form method="post" action="{{ route('admin.wristbands.destroy',$wristband) }}">@csrf @method('delete')<button class="rounded border border-red-200 px-4 py-2 font-bold text-red-700">Hapus</button></form></div></div></div>@endforeach</div><div class="mt-6">{{ $wristbands->links() }}</div></section>
+<section class="grid gap-6">
+    <form method="post" action="{{ route('admin.wristbands.store') }}" class="rounded-lg border bg-white p-5 shadow-sm">
+        @csrf
+        <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 class="text-lg font-black">Tambah Gelang</h2>
+            <button class="fi-btn-dark">Tambah</button>
+        </div>
+        <div class="grid gap-3 md:grid-cols-[1fr_220px]">
+            <select name="e_ticket_id" class="rounded-md border border-neutral-300 px-3 py-2" required>
+                @foreach($tickets as $ticket)
+                    <option value="{{ $ticket->id }}">{{ $ticket->ticket_code }} - {{ $ticket->user->name }} - {{ $ticket->concert->name }}</option>
+                @endforeach
+            </select>
+            <select name="wristband_status" class="rounded-md border border-neutral-300 px-3 py-2" required>
+                <option>aktif</option>
+                <option>sudah_masuk</option>
+                <option>invalid</option>
+            </select>
+        </div>
+    </form>
+
+    <div class="overflow-x-auto rounded-lg border bg-white shadow-sm">
+        <table class="fi-table min-w-[920px]">
+            <thead class="bg-neutral-100 text-xs uppercase tracking-wide text-neutral-600">
+                <tr>
+                    <th class="p-3">Kode Gelang</th>
+                    <th class="p-3">E-Ticket</th>
+                    <th class="p-3">User</th>
+                    <th class="p-3">Konser</th>
+                    <th class="p-3">Status</th>
+                    <th class="p-3 text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($wristbands as $wristband)
+                    <tr class="border-t align-top">
+                        <td class="p-3 font-mono">{{ $wristband->wristband_code }}</td>
+                        <td class="p-3 font-mono text-neutral-500">{{ $wristband->eTicket->ticket_code }}</td>
+                        <td class="p-3">{{ $wristband->eTicket->user->name }}</td>
+                        <td class="p-3 font-bold">{{ $wristband->concert->name }}</td>
+                        <td class="p-3">
+                            <select form="wristband-update-{{ $wristband->id }}" name="wristband_status" class="w-full rounded-md border border-neutral-300 px-3 py-2">
+                                @foreach(['aktif','sudah_masuk','invalid'] as $status)
+                                    <option @selected($wristband->wristband_status===$status)>{{ $status }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td class="p-3">
+                            <form id="wristband-update-{{ $wristband->id }}" method="post" action="{{ route('admin.wristbands.update',$wristband) }}" class="hidden">@csrf @method('put')</form>
+                            <div class="flex justify-end gap-2">
+                                <button form="wristband-update-{{ $wristband->id }}" class="fi-btn-primary">Simpan</button>
+                                <form method="post" action="{{ route('admin.wristbands.destroy',$wristband) }}">
+                                    @csrf
+                                    @method('delete')
+                                    <button class="fi-btn-danger">Hapus</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="6" class="p-6 text-center text-neutral-500">Belum ada gelang.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div>{{ $wristbands->links() }}</div>
+</section>
 @endsection
+

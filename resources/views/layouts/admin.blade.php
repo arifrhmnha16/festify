@@ -6,70 +6,74 @@
     <title>{{ $title ?? 'Admin Festify' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-stone-50 text-neutral-950 antialiased">
+<body class="bg-neutral-100 text-neutral-950 antialiased">
     @php
         $menus = [
-            ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => '□'],
-            ['route' => 'admin.concerts', 'label' => 'Konser', 'icon' => '♪'],
+            ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'D'],
+            ['route' => 'admin.concerts', 'label' => 'Konser', 'icon' => 'K'],
             ['route' => 'admin.users', 'label' => 'User', 'icon' => 'U'],
             ['route' => 'admin.officers', 'label' => 'Petugas', 'icon' => 'P'],
-            ['route' => 'admin.orders', 'label' => 'Pemesanan', 'icon' => '#'],
+            ['route' => 'admin.orders', 'label' => 'Pemesanan', 'icon' => 'O'],
             ['route' => 'admin.payments', 'label' => 'Pembayaran', 'icon' => '$'],
-            ['route' => 'admin.tickets', 'label' => 'E-Ticket', 'icon' => 'Q'],
+            ['route' => 'admin.tickets', 'label' => 'E-Ticket', 'icon' => 'T'],
             ['route' => 'admin.wristbands', 'label' => 'Gelang', 'icon' => 'G'],
             ['route' => 'admin.reports', 'label' => 'Laporan', 'icon' => 'R'],
         ];
     @endphp
 
-    <div class="min-h-screen md:grid md:grid-cols-[280px_1fr]">
-        <aside class="border-b border-neutral-200 bg-neutral-950 text-white md:sticky md:top-0 md:h-screen md:border-b-0 md:border-r">
-            <div class="flex items-center justify-between px-5 py-5 md:block">
-                <div>
-                    <a href="{{ route('admin.dashboard') }}" class="block h-12 w-44 overflow-hidden rounded-md" aria-label="Festify Admin">
-                        <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
-                    </a>
-                    <p class="mt-1 text-xs font-bold uppercase tracking-widest text-orange-200">Admin Panel</p>
-                </div>
-                <form method="post" action="{{ route('logout') }}" class="md:hidden">@csrf<button class="rounded-full border border-white/20 px-4 py-2 text-sm font-bold">Logout</button></form>
+    <div class="min-h-screen lg:grid lg:grid-cols-[18rem_1fr]">
+        <aside class="border-b border-neutral-200 bg-white lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
+            <div class="flex items-center justify-between px-5 py-5">
+                <a href="{{ route('admin.dashboard') }}" class="block h-12 w-40 overflow-hidden rounded-lg border border-neutral-200 bg-white" aria-label="Festify Admin">
+                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
+                </a>
+                <form method="post" action="{{ route('logout') }}" class="lg:hidden">@csrf<button class="fi-btn-muted">Logout</button></form>
             </div>
 
-            <nav class="flex gap-2 overflow-x-auto px-4 pb-4 md:block md:space-y-1 md:overflow-visible md:px-3">
+            <div class="px-5 pb-4">
+                <div class="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3">
+                    <p class="text-sm font-black text-orange-900">{{ auth('admin')->user()?->name ?? 'Admin Festify' }}</p>
+                    <p class="text-xs text-orange-700">{{ auth('admin')->user()?->username ?? 'admin' }}</p>
+                </div>
+            </div>
+
+            <nav class="flex gap-2 overflow-x-auto px-4 pb-4 lg:block lg:space-y-1 lg:overflow-visible">
                 @foreach($menus as $menu)
-                    <a href="{{ route($menu['route']) }}" class="flex shrink-0 items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition {{ request()->routeIs($menu['route']) ? 'bg-white text-neutral-950' : 'text-neutral-300 hover:bg-white/10 hover:text-white' }}">
-                        <span class="grid h-7 w-7 place-items-center rounded-md {{ request()->routeIs($menu['route']) ? 'bg-orange-100 text-orange-700' : 'bg-white/10 text-orange-200' }}">{{ $menu['icon'] }}</span>
-                        {{ $menu['label'] }}
+                    @php($active = request()->routeIs($menu['route']))
+                    <a href="{{ route($menu['route']) }}" class="flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition {{ $active ? 'bg-neutral-950 text-white shadow-sm' : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950' }}">
+                        <span class="grid h-8 w-8 place-items-center rounded-lg text-xs {{ $active ? 'bg-white/15 text-white' : 'bg-neutral-100 text-neutral-500' }}">{{ $menu['icon'] }}</span>
+                        <span>{{ $menu['label'] }}</span>
                     </a>
                 @endforeach
             </nav>
 
-            <div class="mt-auto hidden border-t border-white/10 p-5 md:block">
-                <p class="text-sm font-bold">{{ auth('admin')->user()?->name }}</p>
-                <p class="text-xs text-neutral-400">{{ auth('admin')->user()?->username }}</p>
-                <form method="post" action="{{ route('logout') }}" class="mt-4">@csrf<button class="w-full rounded-full border border-white/20 px-4 py-2 text-sm font-bold hover:bg-white hover:text-neutral-950">Logout</button></form>
+            <div class="hidden px-4 pb-5 lg:block">
+                <div class="rounded-xl border border-neutral-200 bg-neutral-50 p-3">
+                    <a href="{{ route('home') }}" class="fi-btn-muted w-full">Lihat Website</a>
+                    <form method="post" action="{{ route('logout') }}" class="mt-2">@csrf<button class="fi-btn-dark w-full">Logout</button></form>
+                </div>
             </div>
         </aside>
 
         <main class="min-w-0">
-            <header class="border-b border-neutral-200 bg-white px-4 py-5 md:px-8">
+            <header class="sticky top-0 z-30 border-b border-neutral-200 bg-white/90 px-4 py-4 backdrop-blur md:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <div class="mb-2 h-9 w-32 overflow-hidden rounded-md">
-                            <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
-                        </div>
-                        <h1 class="text-2xl font-black">{{ $pageTitle ?? $title ?? 'Dashboard' }}</h1>
+                        <p class="text-xs font-bold uppercase tracking-widest text-neutral-500">Festify Admin</p>
+                        <h1 class="mt-1 text-2xl font-black">{{ $pageTitle ?? $title ?? 'Dashboard' }}</h1>
                     </div>
-                    <a href="{{ route('home') }}" class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-bold">Lihat Website</a>
+                    <a href="{{ route('home') }}" class="fi-btn-muted">Lihat Website</a>
                 </div>
             </header>
 
             @if(session('success'))
-                <div class="px-4 pt-5 md:px-8"><div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div></div>
+                <div class="px-4 pt-5 md:px-8"><div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-800">{{ session('success') }}</div></div>
             @endif
             @if(session('error') || $errors->any())
-                <div class="px-4 pt-5 md:px-8"><div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') ?? $errors->first() }}</div></div>
+                <div class="px-4 pt-5 md:px-8"><div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800">{{ session('error') ?? $errors->first() }}</div></div>
             @endif
 
-            <div class="px-4 py-8 md:px-8">
+            <div class="px-4 py-6 md:px-8">
                 @yield('content')
             </div>
         </main>

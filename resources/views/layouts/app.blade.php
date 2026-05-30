@@ -8,11 +8,11 @@
 </head>
 <body class="bg-stone-50 pb-24 text-neutral-950 antialiased md:pb-0">
     <nav class="sticky top-0 z-40 hidden border-b border-neutral-200 bg-white/95 backdrop-blur md:block">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-            <a href="{{ route('home') }}" class="block h-11 w-40 overflow-hidden rounded-md" aria-label="Festify">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+            <a href="{{ route('home') }}" class="block h-10 w-36 overflow-hidden rounded-md" aria-label="Festify">
                 <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
             </a>
-            <div class="hidden items-center gap-6 text-sm font-medium md:flex">
+            <div class="hidden items-center gap-6 text-sm font-semibold md:flex">
                 <a href="{{ route('home') }}" class="hover:text-orange-700">Beranda</a>
                 <a href="{{ route('concerts.index') }}" class="hover:text-orange-700">Konser</a>
                 <a href="{{ route('home') }}#cara-kerja" class="hover:text-orange-700">Cara Kerja</a>
@@ -39,17 +39,17 @@
 
     <main>
         @if(session('success'))
-            <div class="mx-auto mt-4 max-w-7xl px-4"><div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div></div>
+            <div class="mx-auto mt-4 max-w-6xl px-4"><div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">{{ session('success') }}</div></div>
         @endif
         @if(session('error') || $errors->any())
-            <div class="mx-auto mt-4 max-w-7xl px-4"><div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') ?? $errors->first() }}</div></div>
+            <div class="mx-auto mt-4 max-w-6xl px-4"><div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') ?? $errors->first() }}</div></div>
         @endif
         @yield('content')
     </main>
 
-    <footer class="mt-20 border-t border-neutral-200 bg-white">
-        <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:grid-cols-3">
-            <div><img src="{{ asset('logofest.png') }}" alt="Festify" class="h-12 w-44 rounded-md object-cover object-center"><p class="mt-3 text-sm text-neutral-600">Sistem e-ticket konser, penukaran gelang, dan validasi gate.</p></div>
+    <footer class="mt-12 border-t border-neutral-200 bg-white">
+        <div class="mx-auto grid max-w-6xl gap-5 px-4 py-7 md:grid-cols-3">
+            <div><img src="{{ asset('logofest.png') }}" alt="Festify" class="h-10 w-36 rounded-md object-cover object-center"><p class="mt-3 text-sm text-neutral-600">Sistem e-ticket konser, penukaran gelang, dan validasi gate.</p></div>
             <div class="text-sm text-neutral-600"><strong class="text-neutral-950">Kontak</strong><br>halo@festify.test<br>Jakarta, Indonesia</div>
             <div class="text-sm text-neutral-600"><strong class="text-neutral-950">Sosial</strong><br>Instagram / X / TikTok: @festify</div>
         </div>

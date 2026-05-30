@@ -101,15 +101,24 @@ class UserAreaController extends Controller
         $this->own($order);
         $data = $request->validate([
             'payment_method' => ['required', 'string', 'max:50'],
+            'payment_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ]);
 
-        DB::transaction(function () use ($order, $data) {
-            $order->payment->update($data + ['payment_status' => 'success', 'payment_date' => now()]);
-            $order->update(['order_status' => 'paid']);
-            $this->issueTickets($order);
-        });
+        abort_if($order->payment?->payment_status === 'success', 422, 'Pembayaran sudah diverifikasi.');
 
-        return redirect()->route('user.tickets')->with('success', 'Pembayaran berhasil. E-Ticket sudah terbit.');
+        $proofPath = $request->file('payment_proof')->store('payment-proofs', 'public');
+        $payment = $order->payment ?: $order->payment()->create(['total_amount' => $order->total_price]);
+
+        $payment->update([
+            'payment_method' => $data['payment_method'],
+            'payment_proof' => $proofPath,
+            'payment_status' => 'pending',
+            'payment_date' => now(),
+        ]);
+
+        $order->update(['order_status' => 'pending']);
+
+        return redirect()->route('user.orders.show', $order)->with('success', 'Bukti pembayaran berhasil dikirim. Admin akan memverifikasi sebelum E-Ticket diterbitkan.');
     }
 
     public function tickets()

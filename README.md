@@ -6,7 +6,7 @@ Festify adalah aplikasi web e-ticket konser berbasis Laravel 12. Aplikasi ini me
 
 - Landing page ticketing konser
 - Auth multi-role: user, admin, petugas loket, petugas gate
-- User dapat memilih konser, memilih area venue, checkout, bayar instan, dan langsung menerima E-Ticket
+- User dapat memilih konser, memilih area venue, checkout, mengirim bukti pembayaran, lalu menerima E-Ticket setelah admin memverifikasi pembayaran
 - Admin panel dengan sidebar dan CRUD data utama
 - Petugas loket scan QR E-Ticket atau input kode manual untuk cetak gelang
 - Petugas gate scan QR gelang atau input kode manual untuk validasi masuk
@@ -84,6 +84,6 @@ password: password
 
 ## Catatan
 
-- Pembayaran user saat ini otomatis sukses dan langsung menerbitkan E-Ticket.
+- Pembayaran user masuk sebagai pending sampai admin memverifikasi bukti pembayaran.
 - Upload poster konser disimpan di `storage/app/public/posters`.
 - Scanner QR kamera memakai browser `BarcodeDetector`, paling aman di Chrome/Edge modern.

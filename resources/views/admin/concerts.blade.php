@@ -1,8 +1,89 @@
 @extends('layouts.admin', ['title' => 'Kelola Konser', 'pageTitle' => 'Kelola Konser'])
 @section('content')
-<section>
-<form method="post" enctype="multipart/form-data" action="{{ route('admin.concerts.store') }}" class="grid gap-3 rounded-lg border bg-white p-5 md:grid-cols-3">@csrf
-@foreach(['name'=>'Nama konser','artist'=>'Artis','venue'=>'Venue','date'=>'Tanggal','time'=>'Jam','price'=>'Harga','stock'=>'Stok','seat_zone'=>'Zone'] as $name=>$ph)<input name="{{ $name }}" type="{{ in_array($name,['date','time'])?$name:($name==='price'||$name==='stock'?'number':'text') }}" placeholder="{{ $ph }}" class="rounded-md border px-3 py-2" required="{{ in_array($name,['name','artist','venue','date','time','price','stock']) }}"></input>@endforeach
-<select name="status" class="rounded-md border px-3 py-2"><option>aktif</option><option>selesai</option><option>dibatalkan</option></select><input type="file" name="poster" class="rounded-md border px-3 py-2"><textarea name="description" placeholder="Deskripsi" class="rounded-md border px-3 py-2 md:col-span-3"></textarea><button class="rounded-md bg-neutral-950 px-4 py-2 font-bold text-white">Tambah Konser</button></form>
-<div class="mt-8 grid gap-4">@foreach($concerts as $concert)<div class="rounded-lg border bg-white p-4"><div class="mb-3 flex flex-wrap items-center justify-between gap-2">@if($concert->is_featured)<span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-black uppercase tracking-widest text-orange-700">Konser Unggulan</span>@else<span class="text-sm text-neutral-500">Belum unggulan</span>@endif<form method="post" action="{{ route('admin.concerts.featured',$concert) }}">@csrf @method('patch')<button class="rounded-full {{ $concert->is_featured ? 'border border-neutral-300 bg-white text-neutral-500' : 'bg-neutral-950 text-white' }} px-4 py-2 text-sm font-bold" @disabled($concert->is_featured)>{{ $concert->is_featured ? 'Sedang Unggulan' : 'Jadikan Konser Unggulan' }}</button></form></div><form method="post" action="{{ route('admin.concerts.update',$concert) }}">@csrf @method('put')<div class="grid gap-2 md:grid-cols-6"><input name="name" value="{{ $concert->name }}" class="rounded border px-2 py-2"><input name="artist" value="{{ $concert->artist }}" class="rounded border px-2 py-2"><input name="venue" value="{{ $concert->venue }}" class="rounded border px-2 py-2"><input type="date" name="date" value="{{ $concert->date->toDateString() }}" class="rounded border px-2 py-2"><input type="time" name="time" value="{{ substr($concert->time,0,5) }}" class="rounded border px-2 py-2"><input type="number" name="price" value="{{ $concert->price }}" class="rounded border px-2 py-2"><input type="number" name="stock" value="{{ $concert->stock }}" class="rounded border px-2 py-2"><input name="seat_zone" value="{{ $concert->seat_zone }}" class="rounded border px-2 py-2"><select name="status" class="rounded border px-2 py-2">@foreach(['aktif','selesai','dibatalkan'] as $s)<option @selected($concert->status===$s)>{{ $s }}</option>@endforeach</select><input type="hidden" name="description" value="{{ $concert->description }}"><button class="rounded bg-orange-700 px-3 py-2 font-bold text-white">Simpan</button></div></form><form method="post" action="{{ route('admin.concerts.destroy',$concert) }}" class="mt-2">@csrf @method('delete')<button class="text-sm font-bold text-red-700">Hapus Konser</button></form></div>@endforeach</div><div class="mt-6">{{ $concerts->links() }}</div></section>
+<section class="grid gap-6">
+    <div class="fi-card p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h2 class="text-lg font-black">Data Konser</h2>
+                <p class="text-sm text-neutral-500">Kelola konser dari halaman create dan edit terpisah.</p>
+            </div>
+            <a href="{{ route('admin.concerts.create') }}" class="fi-btn-dark">Tambah Konser</a>
+        </div>
+    </div>
+
+    <div class="fi-card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="fi-table min-w-[1100px]">
+                <thead>
+                    <tr>
+                        <th>Poster</th>
+                        <th>Konser</th>
+                        <th>Artis</th>
+                        <th>Venue</th>
+                        <th>Jadwal</th>
+                        <th>Harga</th>
+                        <th>Stok</th>
+                        <th>Status</th>
+                        <th>Unggulan</th>
+                        <th class="text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($concerts as $concert)
+                        <tr>
+                            <td>
+                                <div class="h-14 w-20 overflow-hidden rounded-lg bg-neutral-100">
+                                    @if($concert->poster)
+                                        <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="h-full w-full object-cover">
+                                    @else
+                                        <div class="grid h-full place-items-center text-xs font-bold text-neutral-400">No Poster</div>
+                                    @endif
+                                </div>
+                            </td>
+                            <td>
+                                <p class="font-black">{{ $concert->name }}</p>
+                                <p class="text-xs text-neutral-500">{{ $concert->seat_zone ?: 'Zona belum diisi' }}</p>
+                            </td>
+                            <td>{{ $concert->artist }}</td>
+                            <td>{{ $concert->venue }}</td>
+                            <td>
+                                <p class="font-bold">{{ $concert->date->format('d M Y') }}</p>
+                                <p class="text-xs text-neutral-500">{{ substr($concert->time, 0, 5) }} WIB</p>
+                            </td>
+                            <td class="font-black">Rp{{ number_format($concert->price,0,',','.') }}</td>
+                            <td>{{ $concert->stock }}</td>
+                            <td>
+                                <span class="{{ $concert->status === 'aktif' ? 'fi-badge-success' : ($concert->status === 'dibatalkan' ? 'fi-badge-danger' : 'fi-badge-neutral') }}">{{ $concert->status }}</span>
+                            </td>
+                            <td>
+                                @if($concert->is_featured)
+                                    <span class="fi-badge-warning">Unggulan</span>
+                                @else
+                                    <form method="post" action="{{ route('admin.concerts.featured',$concert) }}">
+                                        @csrf
+                                        @method('patch')
+                                        <button class="fi-btn-muted">Jadikan</button>
+                                    </form>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ route('admin.concerts.edit', $concert) }}" class="fi-btn-primary">Edit</a>
+                                    <form method="post" action="{{ route('admin.concerts.destroy',$concert) }}">
+                                        @csrf
+                                        @method('delete')
+                                        <button class="fi-btn-danger">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="10" class="text-center text-neutral-500">Belum ada konser.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div>{{ $concerts->links() }}</div>
+</section>
 @endsection

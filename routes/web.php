@@ -41,7 +41,9 @@ Route::middleware('role:user')->prefix('user')->name('user.')->group(function ()
 Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/concerts', [AdminController::class, 'concerts'])->name('concerts');
+    Route::get('/concerts/create', [AdminController::class, 'createConcert'])->name('concerts.create');
     Route::post('/concerts', [AdminController::class, 'storeConcert'])->name('concerts.store');
+    Route::get('/concerts/{concert}/edit', [AdminController::class, 'editConcert'])->name('concerts.edit');
     Route::put('/concerts/{concert}', [AdminController::class, 'updateConcert'])->name('concerts.update');
     Route::patch('/concerts/{concert}/featured', [AdminController::class, 'featureConcert'])->name('concerts.featured');
     Route::delete('/concerts/{concert}', [AdminController::class, 'destroyConcert'])->name('concerts.destroy');
