@@ -1,12 +1,9 @@
 @extends('layouts.app', ['title' => 'E-Ticket'])
 @section('content')
 <section class="mx-auto max-w-7xl px-4 py-12">
-    <div class="flex flex-wrap items-end justify-between gap-3">
-        <div>
-            <p class="text-sm font-bold uppercase text-orange-700">Tiket digital</p>
-            <h1 class="mt-2 text-4xl font-black">E-Ticket Saya</h1>
-        </div>
-        <a href="{{ route('user.wristbands') }}" class="rounded-full border px-5 py-3 font-bold">Gelang Saya</a>
+    <div>
+        <p class="text-sm font-bold uppercase text-orange-700">Tiket digital</p>
+        <h1 class="mt-2 text-4xl font-black">E-Ticket Saya</h1>
     </div>
 
     <div class="mt-6 grid gap-4 md:grid-cols-2">

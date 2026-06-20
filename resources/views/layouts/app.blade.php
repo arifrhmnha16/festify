@@ -31,7 +31,6 @@
                 <a href="{{ route('home') }}#cara-kerja" class="hover:text-orange-700">Cara Kerja</a>
                 @auth
                     <a href="{{ route('user.tickets') }}" class="rounded-full bg-orange-700 px-4 py-2 font-bold text-white hover:bg-orange-800">Tiket Saya</a>
-                    <a href="{{ route('user.wristbands') }}" class="hover:text-orange-700">Gelang Saya</a>
                 @endauth
                 @if(auth('admin')->check())
                     <a href="{{ route('admin.dashboard') }}" class="hover:text-orange-700">Admin</a>
@@ -84,9 +83,9 @@
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 0 0-4Z"/><path d="M9 8h6"/><path d="M9 16h6"/></svg>
                     <span>Tiket</span>
                 </a>
-                <a href="{{ route('user.wristbands') }}" class="grid justify-items-center gap-1 rounded-lg px-2 py-2 {{ request()->routeIs('user.wristbands') ? 'text-orange-700' : '' }}" aria-label="Gelang Saya">
-                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7a5 5 0 0 1 10 0"/><path d="M7 7v10a5 5 0 0 0 10 0V7"/><path d="M9 12h6"/></svg>
-                    <span>Gelang</span>
+                <a href="{{ route('user.orders') }}" class="grid justify-items-center gap-1 rounded-lg px-2 py-2 {{ request()->routeIs('user.orders*') ? 'text-orange-700' : '' }}" aria-label="Pesanan">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2Z"/><path d="M9 7h6"/><path d="M9 11h6"/><path d="M9 15h4"/></svg>
+                    <span>Pesanan</span>
                 </a>
             @elseif(auth('admin')->check())
                 <a href="{{ route('admin.dashboard') }}" class="grid justify-items-center gap-1 rounded-lg px-2 py-2" aria-label="Admin">
