@@ -12,8 +12,8 @@ use App\Models\ScanHistory;
 use App\Models\TicketZone;
 use App\Models\User;
 use App\Models\Wristband;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\FestifyResetPassword;
+use App\Notifications\FestifyVerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -45,7 +45,7 @@ class FestifyWorkflowTest extends TestCase
 
         $user = User::where('email', 'nadia@example.com')->firstOrFail();
 
-        Notification::assertSentTo($user, VerifyEmail::class);
+        Notification::assertSentTo($user, FestifyVerifyEmail::class);
     }
 
     public function test_password_reset_link_can_be_requested(): void
@@ -56,7 +56,7 @@ class FestifyWorkflowTest extends TestCase
         $this->post(route('password.email'), ['email' => 'nadia@example.com'])
             ->assertSessionHasNoErrors();
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, FestifyResetPassword::class);
     }
 
     public function test_user_order_locks_and_decrements_concert_and_zone_stock(): void

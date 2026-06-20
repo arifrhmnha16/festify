@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use App\Notifications\FestifyResetPassword;
+use App\Notifications\FestifyVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -50,4 +52,14 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function orders() { return $this->hasMany(Order::class); }
     public function eTickets() { return $this->hasMany(ETicket::class); }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new FestifyVerifyEmail);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new FestifyResetPassword($token));
+    }
 }
