@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Passwords\PasswordBroker;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -20,7 +20,23 @@ class AuthController extends Controller
     public function showRegister() { return view('auth.register'); }
     public function showForgotPassword() { return view('auth.forgot-password'); }
     public function showResetPassword(Request $request, string $token) { return view('auth.reset-password', ['token' => $token, 'email' => $request->email]); }
-    public function showVerificationNotice() { return view('auth.verify-email'); }
+    public function showVerificationNotice(Request $request)
+    {
+        $localVerificationUrl = null;
+
+        if (app()->environment('local') && config('mail.default') === 'log' && $request->user()) {
+            $localVerificationUrl = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(60),
+                [
+                    'id' => $request->user()->getKey(),
+                    'hash' => sha1($request->user()->getEmailForVerification()),
+                ],
+            );
+        }
+
+        return view('auth.verify-email', compact('localVerificationUrl'));
+    }
 
     public function register(Request $request)
     {
@@ -130,13 +146,19 @@ class AuthController extends Controller
             : back()->withErrors(['email' => __($status)])->onlyInput('email');
     }
 
-    public function verifyEmail(EmailVerificationRequest $request)
+    public function verifyEmail(Request $request, int $id, string $hash)
     {
-        if ($request->user()->hasVerifiedEmail()) {
+        $user = User::findOrFail($id);
+
+        abort_unless(hash_equals($hash, sha1($user->getEmailForVerification())), 403);
+
+        if ($user->hasVerifiedEmail()) {
+            Auth::login($user);
             return redirect()->route('user.dashboard');
         }
 
-        $request->fulfill();
+        $user->markEmailAsVerified();
+        Auth::login($user);
 
         return redirect()->route('user.dashboard')->with('success', 'Email berhasil diverifikasi.');
     }
