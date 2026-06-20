@@ -50,6 +50,7 @@ Route::middleware(['role:user', 'verified'])->prefix('user')->name('user.')->gro
     Route::post('/payments/{order}', [UserAreaController::class, 'submitPayment'])->name('payments.submit');
     Route::get('/e-tickets', [UserAreaController::class, 'tickets'])->name('tickets');
     Route::get('/e-tickets/{ticket}', [UserAreaController::class, 'ticket'])->name('tickets.show');
+    Route::get('/wristbands', [UserAreaController::class, 'wristbands'])->name('wristbands');
 });
 
 Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {

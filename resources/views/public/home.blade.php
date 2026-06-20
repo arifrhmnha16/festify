@@ -3,7 +3,13 @@
 <section class="bg-white">
     <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-8 md:min-h-[520px] md:grid-cols-[.95fr_.85fr] md:gap-10 md:py-10">
         <div>
-            <p class="mb-3 text-xs font-black uppercase tracking-widest text-orange-700">E-ticket konser premium</p>
+            <p class="mb-3 text-xs font-black uppercase tracking-widest text-orange-700">
+                @auth
+                    Selamat datang, {{ auth()->user()->name }}
+                @else
+                    Selamat datang di Festify
+                @endauth
+            </p>
             <h1 class="max-w-xl text-[36px] font-black leading-[1.08] md:text-[40px] lg:text-[44px]">Temukan Konser Favoritmu dan Masuk Pakai E-Ticket</h1>
             <p class="mt-4 max-w-lg text-base leading-7 text-neutral-600">Festify memudahkan pembelian tiket konser online, penerbitan E-Ticket, penukaran gelang, dan validasi masuk venue.</p>
             <div class="mt-6 flex flex-wrap gap-3">
@@ -33,7 +39,7 @@
                     <div class="min-w-0">
                         <h2 class="text-2xl font-black leading-tight">{{ $heroConcert?->name ?? 'Festify Live Night' }}</h2>
                         <p class="mt-1 text-sm text-neutral-600">{{ $heroConcert?->artist ?? 'Lineup pilihan minggu ini' }}</p>
-                        <p class="mt-3 text-sm font-bold text-neutral-900">{{ $heroConcert?->venue ?? 'Venue partner Festify' }} · {{ $heroConcert ? substr($heroConcert->time, 0, 5) : '19:00' }} WIB</p>
+                        <p class="mt-3 text-sm font-bold text-neutral-900">{{ $heroConcert?->venue ?? 'Venue partner Festify' }} - {{ $heroConcert ? substr($heroConcert->time, 0, 5) : '19:00' }} WIB</p>
                     </div>
                     <div class="text-left sm:text-right">
                         <p class="text-xs text-neutral-500">Mulai</p>

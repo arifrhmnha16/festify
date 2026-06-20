@@ -7,6 +7,7 @@ use App\Models\ETicket;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\TicketZone;
+use App\Models\Wristband;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -130,6 +131,21 @@ class UserAreaController extends Controller
     {
         $tickets = Auth::user()->eTickets()->with('concert', 'order.ticketZone', 'order.payment', 'wristband')->latest()->paginate(10);
         return view('user.e-tickets', compact('tickets'));
+    }
+
+    public function wristbands()
+    {
+        $wristbands = Wristband::with('eTicket.concert', 'eTicket.order.ticketZone')
+            ->whereHas('eTicket', fn ($query) => $query->where('user_id', Auth::id()))
+            ->latest('activated_at')
+            ->paginate(10);
+        $pendingTickets = Auth::user()->eTickets()
+            ->with('concert', 'order.ticketZone')
+            ->doesntHave('wristband')
+            ->latest()
+            ->get();
+
+        return view('user.wristbands', compact('wristbands', 'pendingTickets'));
     }
 
     public function ticket(ETicket $ticket)
