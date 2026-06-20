@@ -3,8 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Passwords\PasswordBroker;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -12,6 +18,9 @@ class AuthController extends Controller
     public function showAdminLogin() { return view('auth.admin-login'); }
     public function showOfficerLogin(string $role) { return view('auth.officer-login', compact('role')); }
     public function showRegister() { return view('auth.register'); }
+    public function showForgotPassword() { return view('auth.forgot-password'); }
+    public function showResetPassword(Request $request, string $token) { return view('auth.reset-password', ['token' => $token, 'email' => $request->email]); }
+    public function showVerificationNotice() { return view('auth.verify-email'); }
 
     public function register(Request $request)
     {
@@ -23,6 +32,8 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($data);
+        event(new Registered($user));
+
         Auth::login($user);
 
         return redirect()->route('user.dashboard');
@@ -86,6 +97,59 @@ class AuthController extends Controller
         }
 
         return redirect()->route('login');
+    }
+
+    public function sendPasswordResetLink(Request $request)
+    {
+        $request->validate(['email' => ['required', 'email']]);
+
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with('success', __($status))
+            : back()->withErrors(['email' => __($status)])->onlyInput('email');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $data = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed', 'min:6'],
+        ]);
+
+        $status = Password::reset($data, function (User $user, string $password) {
+            $user->forceFill([
+                'password' => Hash::make($password),
+                'remember_token' => Str::random(60),
+            ])->save();
+        });
+
+        return $status === PasswordBroker::PASSWORD_RESET
+            ? redirect()->route('login')->with('success', __($status))
+            : back()->withErrors(['email' => __($status)])->onlyInput('email');
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request)
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('user.dashboard');
+        }
+
+        $request->fulfill();
+
+        return redirect()->route('user.dashboard')->with('success', 'Email berhasil diverifikasi.');
+    }
+
+    public function resendVerificationEmail(Request $request)
+    {
+        if ($request->user()?->hasVerifiedEmail()) {
+            return redirect()->route('user.dashboard');
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('success', 'Link verifikasi email sudah dikirim ulang.');
     }
 
     public function logout(Request $request)

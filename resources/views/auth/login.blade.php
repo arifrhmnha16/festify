@@ -9,7 +9,10 @@
         <label class="mt-4 block text-sm font-bold">Password</label>
         <input type="password" name="password" class="mt-2 w-full rounded-md border border-neutral-300 px-4 py-3" required>
         <button class="mt-6 w-full rounded-full bg-neutral-950 px-5 py-3 font-bold text-white">Login</button>
-        <p class="mt-4 text-center text-sm text-neutral-600">Belum punya akun? <a class="font-bold text-orange-700" href="{{ route('register') }}">Register</a></p>
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm text-neutral-600">
+            <a class="font-bold text-orange-700" href="{{ route('password.request') }}">Lupa password?</a>
+            <span>Belum punya akun? <a class="font-bold text-orange-700" href="{{ route('register') }}">Register</a></span>
+        </div>
     </form>
 </section>
 @endsection

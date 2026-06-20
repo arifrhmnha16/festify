@@ -15,7 +15,21 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.store');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->middleware('guest')->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendPasswordResetLink'])->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.update');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('/email/verify', [AuthController::class, 'showVerificationNotice'])
+    ->middleware('auth')
+    ->name('verification.notice');
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+    ->middleware(['auth', 'signed', 'throttle:6,1'])
+    ->name('verification.verify');
+Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('verification.send');
 
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.store');
@@ -24,7 +38,7 @@ Route::post('/loket/login', fn (Illuminate\Http\Request $request) => app(AuthCon
 Route::get('/gate/login', fn () => app(AuthController::class)->showOfficerLogin('gate'))->name('gate.login');
 Route::post('/gate/login', fn (Illuminate\Http\Request $request) => app(AuthController::class)->officerLogin($request, 'gate'))->name('gate.login.store');
 
-Route::middleware('role:user')->prefix('user')->name('user.')->group(function () {
+Route::middleware(['role:user', 'verified'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [UserAreaController::class, 'dashboard'])->name('dashboard');
     Route::get('/concerts', [UserAreaController::class, 'concerts'])->name('concerts');
     Route::get('/concerts/{concert}', [UserAreaController::class, 'concert'])->name('concerts.show');
@@ -72,6 +86,7 @@ Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function
     Route::put('/wristbands/{wristband}', [AdminController::class, 'updateWristband'])->name('wristbands.update');
     Route::delete('/wristbands/{wristband}', [AdminController::class, 'destroyWristband'])->name('wristbands.destroy');
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    Route::get('/reports/export', [AdminController::class, 'exportReports'])->name('reports.export');
     Route::delete('/reports/{history}', [AdminController::class, 'destroyScanHistory'])->name('reports.destroy');
 });
 

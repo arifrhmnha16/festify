@@ -51,10 +51,15 @@ class UserAreaController extends Controller
             'ticket_quantity' => ['required', 'integer', 'min:1', 'max:5'],
         ]);
 
-        $zone = TicketZone::where('concert_id', $concert->id)->findOrFail($data['ticket_zone_id']);
-        abort_if($concert->stock < $data['ticket_quantity'] || $zone->stock < $data['ticket_quantity'], 422, 'Stok tiket tidak cukup.');
+        $order = DB::transaction(function () use ($concert, $data) {
+            $concert = Concert::whereKey($concert->id)->lockForUpdate()->firstOrFail();
+            $zone = TicketZone::where('concert_id', $concert->id)
+                ->whereKey($data['ticket_zone_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $order = DB::transaction(function () use ($concert, $zone, $data) {
+            abort_if($concert->stock < $data['ticket_quantity'] || $zone->stock < $data['ticket_quantity'], 422, 'Stok tiket tidak cukup.');
+
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'concert_id' => $concert->id,

@@ -3,8 +3,13 @@
 <section class="grid gap-6">
     <div class="fi-card overflow-hidden">
         <div class="border-b border-neutral-100 px-5 py-4">
-            <h2 class="text-lg font-black">Riwayat Scan</h2>
-            <p class="text-sm text-neutral-500">Log validasi E-Ticket dan gelang dari petugas loket/gate.</p>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-black">Riwayat Scan</h2>
+                    <p class="text-sm text-neutral-500">Log validasi E-Ticket dan gelang dari petugas loket/gate.</p>
+                </div>
+                <a href="{{ route('admin.reports.export') }}" class="fi-btn-dark">Export CSV</a>
+            </div>
         </div>
         <div class="overflow-x-auto">
             <table class="fi-table min-w-[920px]">

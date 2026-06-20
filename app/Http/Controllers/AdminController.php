@@ -362,6 +362,35 @@ class AdminController extends Controller
         return view('admin.reports', compact('histories'));
     }
 
+    public function exportReports()
+    {
+        $fileName = 'festify-scan-report-'.now()->format('Ymd-His').'.csv';
+
+        return response()->streamDownload(function () {
+            $output = fopen('php://output', 'w');
+            fputcsv($output, ['Waktu', 'Petugas', 'Tipe', 'Hasil', 'Kode E-Ticket', 'Kode Gelang', 'User', 'Pesan']);
+
+            ScanHistory::with('officer', 'eTicket.user', 'wristband')
+                ->latest('scanned_at')
+                ->chunk(100, function ($histories) use ($output) {
+                    foreach ($histories as $history) {
+                        fputcsv($output, [
+                            $history->scanned_at?->format('Y-m-d H:i:s'),
+                            $history->officer?->name,
+                            $history->scan_type,
+                            $history->scan_result,
+                            $history->eTicket?->ticket_code,
+                            $history->wristband?->wristband_code,
+                            $history->eTicket?->user?->name,
+                            $history->message,
+                        ]);
+                    }
+                });
+
+            fclose($output);
+        }, $fileName, ['Content-Type' => 'text/csv']);
+    }
+
     public function destroyScanHistory(ScanHistory $history)
     {
         $history->delete();

@@ -15,7 +15,13 @@ class OfficerController extends Controller
     {
         $exchanged = ETicket::where('ticket_status', 'sudah_ditukar')->count();
         $active = Wristband::where('wristband_status', 'aktif')->count();
-        return view('loket.dashboard', compact('exchanged', 'active'));
+        $histories = ScanHistory::with('officer', 'eTicket.user')
+            ->where('scan_type', 'scan_eticket')
+            ->latest('scanned_at')
+            ->limit(8)
+            ->get();
+
+        return view('loket.dashboard', compact('exchanged', 'active', 'histories'));
     }
 
     public function scanEticket() { return view('loket.scan'); }
@@ -55,7 +61,13 @@ class OfficerController extends Controller
     {
         $entered = Wristband::where('wristband_status', 'sudah_masuk')->count();
         $active = Wristband::where('wristband_status', 'aktif')->count();
-        return view('gate.dashboard', compact('entered', 'active'));
+        $histories = ScanHistory::with('officer', 'wristband.eTicket.user')
+            ->where('scan_type', 'scan_gelang')
+            ->latest('scanned_at')
+            ->limit(8)
+            ->get();
+
+        return view('gate.dashboard', compact('entered', 'active', 'histories'));
     }
 
     public function scanWristband() { return view('gate.scan'); }
@@ -69,6 +81,8 @@ class OfficerController extends Controller
 
         if ($wristband && $wristband->wristband_status !== 'aktif') {
             $message = 'Gelang sudah digunakan atau invalid.';
+        } elseif ($wristband && $wristband->concert->date->toDateString() !== now()->toDateString()) {
+            $message = 'Konser tidak sesuai hari ini.';
         } elseif ($wristband) {
             $wristband->update(['wristband_status' => 'sudah_masuk', 'entered_at' => now()]);
             $message = 'Akses diterima. Silakan masuk.';
