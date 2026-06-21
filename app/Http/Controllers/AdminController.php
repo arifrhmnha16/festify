@@ -438,7 +438,7 @@ class AdminController extends Controller
             'venue' => ['required', 'string', 'max:150'],
             'date' => ['required', 'date'],
             'time' => ['required'],
-            'poster' => ['nullable', 'image', 'max:2048'],
+            'poster' => ['nullable', 'image', 'dimensions:width=8000,height=2000', 'max:10240'],
             'price' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'status' => ['required', 'in:aktif,selesai,dibatalkan'],

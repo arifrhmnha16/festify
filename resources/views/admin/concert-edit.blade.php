@@ -59,15 +59,15 @@
             <aside class="grid gap-4">
                 <div class="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
                     @if($concert->poster)
-                        <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="aspect-[4/3] w-full object-cover">
+                        <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="aspect-[4/1] w-full object-cover">
                     @else
-                        <div class="grid aspect-[4/3] place-items-center text-sm font-bold text-neutral-400">Belum ada poster</div>
+                        <div class="grid aspect-[4/1] place-items-center text-sm font-bold text-neutral-400">Belum ada poster</div>
                     @endif
                 </div>
                 <div class="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-5">
                     <label class="text-sm font-bold">Ganti poster</label>
                     <input type="file" name="poster" accept="image/*" class="fi-field mt-3 w-full">
-                    <p class="mt-2 text-xs text-neutral-500">Kosongkan jika poster tidak ingin diganti.</p>
+                    <p class="mt-2 text-xs text-neutral-500">Kosongkan jika poster tidak ingin diganti. Ukuran wajib 8000 x 2000 px, maksimal 10 MB.</p>
                 </div>
             </aside>
         </div>

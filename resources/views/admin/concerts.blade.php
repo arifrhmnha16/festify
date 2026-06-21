@@ -32,7 +32,7 @@
                     @forelse($concerts as $concert)
                         <tr>
                             <td>
-                                <div class="h-14 w-20 overflow-hidden rounded-lg bg-neutral-100">
+                                <div class="aspect-[4/1] w-32 overflow-hidden rounded-lg bg-neutral-100">
                                     @if($concert->poster)
                                         <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="h-full w-full object-cover">
                                     @else

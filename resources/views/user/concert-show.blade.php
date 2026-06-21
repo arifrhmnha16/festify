@@ -1,7 +1,7 @@
 @extends('layouts.app', ['title' => $concert->name])
 @section('content')
-<section class="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-[.9fr_1.1fr]">
-    <div class="aspect-[4/3] overflow-hidden rounded-lg bg-neutral-900">
+<section class="mx-auto grid max-w-7xl gap-8 px-4 py-12">
+    <div class="aspect-[4/1] overflow-hidden rounded-lg bg-neutral-900">
         @if($concert->poster)
             <img src="{{ asset('storage/'.$concert->poster) }}" class="h-full w-full object-cover" alt="{{ $concert->name }}">
         @else

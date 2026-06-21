@@ -13,7 +13,7 @@
             <div class="flex transition-transform duration-500 ease-out" data-promo-track>
                 @forelse($bannerConcerts as $concert)
                     <article class="relative min-w-full">
-                        <div class="relative min-h-[470px] overflow-hidden md:min-h-[520px]">
+                        <div class="relative aspect-[4/1] min-h-[300px] overflow-hidden md:min-h-0">
                             @if($concert->poster)
                                 <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="absolute inset-0 h-full w-full object-cover">
                             @else
@@ -33,16 +33,16 @@
                                     @endauth
                                 </p>
                             </div>
-                            <div class="relative z-10 mx-auto flex min-h-[470px] max-w-7xl items-center px-7 pb-24 pt-24 text-white md:min-h-[520px] md:px-10">
+                            <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-7 pb-24 pt-20 text-white md:px-10">
                                 <div class="max-w-3xl">
-                                    <h1 class="text-[44px] font-black leading-[.98] tracking-wide md:text-[72px] lg:text-[88px]">{{ $concert->name }}</h1>
-                                    <p class="mt-5 text-xl font-bold text-neutral-100 md:text-2xl">with {{ $concert->artist }}</p>
-                                    <div class="mt-9 grid max-w-4xl gap-6 text-lg font-bold text-neutral-100 md:grid-cols-3 md:text-2xl">
+                                    <h1 class="text-[34px] font-black leading-[.98] tracking-wide md:text-[54px] lg:text-[70px]">{{ $concert->name }}</h1>
+                                    <p class="mt-4 text-lg font-bold text-neutral-100 md:text-xl">with {{ $concert->artist }}</p>
+                                    <div class="mt-7 grid max-w-4xl gap-4 text-base font-bold text-neutral-100 md:grid-cols-3 md:text-xl">
                                         <p>{{ $concert->date->format('F d') }}</p>
                                         <p>{{ $concert->venue }}</p>
                                         <p>{{ substr($concert->time, 0, 5) }} WIB</p>
                                     </div>
-                                    <p class="mt-8 text-sm font-bold uppercase tracking-widest text-neutral-200 md:text-base">Tickets available at Festify</p>
+                                    <p class="mt-6 text-sm font-bold uppercase tracking-widest text-neutral-200">Tickets available at Festify</p>
                                 </div>
                             </div>
                             <a href="{{ route('concerts.show', $concert) }}" class="absolute bottom-8 left-1/2 z-20 flex w-[min(720px,calc(100%-2rem))] -translate-x-1/2 items-center justify-between gap-4 rounded-xl bg-white/85 px-5 py-4 text-base font-black text-neutral-950 shadow-lg backdrop-blur md:text-xl">
@@ -53,14 +53,14 @@
                     </article>
                 @empty
                     <article class="relative min-w-full">
-                        <div class="relative min-h-[470px] overflow-hidden md:min-h-[520px]">
+                        <div class="relative aspect-[4/1] min-h-[300px] overflow-hidden md:min-h-0">
                             <img src="{{ asset('logofest.png') }}" alt="Festify" class="absolute inset-0 h-full w-full object-cover opacity-80">
                             <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,24,39,.88)_0%,rgba(67,20,7,.62)_48%,rgba(17,24,39,.18)_100%)]"></div>
-                            <div class="relative z-10 mx-auto flex min-h-[470px] max-w-7xl items-center px-7 pb-24 pt-24 text-white md:min-h-[520px] md:px-10">
+                            <div class="relative z-10 mx-auto flex h-full max-w-7xl items-center px-7 pb-24 pt-20 text-white md:px-10">
                                 <div class="max-w-3xl">
                                     <p class="text-xs font-black uppercase tracking-widest text-orange-200">Festify Live</p>
-                                    <h1 class="mt-4 text-[44px] font-black leading-[.98] md:text-[76px]">Temukan Konser Favoritmu</h1>
-                                    <p class="mt-5 text-xl font-bold text-neutral-100">Pesan tiket, terima E-Ticket QR, tukar gelang, dan masuk venue lebih cepat.</p>
+                                    <h1 class="mt-4 text-[34px] font-black leading-[.98] md:text-[58px]">Temukan Konser Favoritmu</h1>
+                                    <p class="mt-5 text-lg font-bold text-neutral-100">Pesan tiket, terima E-Ticket QR, tukar gelang, dan masuk venue lebih cepat.</p>
                                 </div>
                             </div>
                             <a href="{{ route('concerts.index') }}" class="absolute bottom-8 left-1/2 z-20 flex w-[min(620px,calc(100%-2rem))] -translate-x-1/2 items-center justify-center rounded-xl bg-white/85 px-5 py-4 text-base font-black text-neutral-950 shadow-lg backdrop-blur md:text-xl">Lihat konser tersedia</a>

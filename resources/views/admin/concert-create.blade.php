@@ -59,7 +59,7 @@
                 <div class="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-5">
                     <label class="text-sm font-bold">Poster konser</label>
                     <input type="file" name="poster" accept="image/*" class="fi-field mt-3 w-full">
-                    <p class="mt-2 text-xs text-neutral-500">JPG, PNG, atau WEBP. Maksimal 2 MB.</p>
+                    <p class="mt-2 text-xs text-neutral-500">JPG, PNG, atau WEBP. Ukuran wajib 8000 x 2000 px. Maksimal 10 MB.</p>
                 </div>
                 <div class="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900">
                     Zona utama otomatis: <strong>Festival Tengah</strong>. Harga zona dibuat otomatis dari harga dasar.

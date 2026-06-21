@@ -1,5 +1,5 @@
 <div class="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
-    <div class="aspect-[16/10] bg-neutral-900">
+    <div class="aspect-[4/1] bg-neutral-900">
         @if($concert->poster)
             <img src="{{ asset('storage/'.$concert->poster) }}" class="h-full w-full object-cover" alt="{{ $concert->name }}">
         @else

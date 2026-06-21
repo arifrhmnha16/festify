@@ -19,11 +19,11 @@
 </style>
 <section class="mx-auto max-w-3xl px-4 py-12 print:p-0">
     <div id="ticket-print" class="rounded-lg border bg-white p-8 shadow-sm">
-        <div class="grid gap-6 md:grid-cols-[1fr_220px]">
+        <div class="grid gap-6">
             <div>
                 <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-12 w-44 rounded-md object-cover object-center"><p class="mt-4 text-sm font-bold uppercase text-orange-700">E-Ticket</p><h1 class="mt-2 text-4xl font-black">{{ $ticket->concert->name }}</h1><p class="mt-2">{{ $ticket->user->name }} - {{ $ticket->concert->venue }}</p>
             </div>
-            <div class="aspect-[4/3] overflow-hidden rounded-lg bg-neutral-950">
+            <div class="aspect-[4/1] overflow-hidden rounded-lg bg-neutral-950">
                 @if($ticket->concert->poster)
                     <img src="{{ asset('storage/'.$ticket->concert->poster) }}" alt="{{ $ticket->concert->name }}" class="h-full w-full object-cover">
                 @else
