@@ -9,14 +9,21 @@ class PublicController extends Controller
 {
     public function home(Request $request)
     {
-        $concerts = $this->concertQuery($request)->limit(6)->get();
+        $concerts = $this->concertQuery($request)->limit(3)->get();
+        $upcomingConcerts = Concert::query()
+            ->where('status', 'aktif')
+            ->whereDate('date', '>=', now()->toDateString())
+            ->orderBy('date')
+            ->orderBy('time')
+            ->limit(3)
+            ->get();
         $featuredConcert = Concert::where('status', 'aktif')->where('is_featured', true)->first() ?? $concerts->first();
 
         if ($featuredConcert && ! $concerts->contains('id', $featuredConcert->id)) {
-            $concerts = collect([$featuredConcert])->merge($concerts)->take(6);
+            $concerts = collect([$featuredConcert])->merge($concerts)->take(3);
         }
 
-        return view('public.home', compact('concerts', 'featuredConcert'));
+        return view('public.home', compact('concerts', 'featuredConcert', 'upcomingConcerts'));
     }
 
     public function concerts(Request $request)

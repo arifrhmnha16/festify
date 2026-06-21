@@ -50,6 +50,11 @@
                         @endforeach
                     </select>
                 </div>
+                <label class="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-bold">
+                    <input type="hidden" name="is_promo" value="0">
+                    <input type="checkbox" name="is_promo" value="1" @checked(old('is_promo', $concert->is_promo)) class="h-4 w-4 rounded border-neutral-300 text-orange-700">
+                    Tampilkan badge promo
+                </label>
                 <div class="md:col-span-2">
                     <label class="text-sm font-bold">Deskripsi</label>
                     <textarea name="description" rows="6" class="fi-field mt-2 w-full">{{ old('description', $concert->description) }}</textarea>
@@ -67,7 +72,7 @@
                 <div class="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-5">
                     <label class="text-sm font-bold">Ganti poster</label>
                     <input type="file" name="poster" accept="image/*" class="fi-field mt-3 w-full">
-                    <p class="mt-2 text-xs text-neutral-500">Kosongkan jika poster tidak ingin diganti. Ukuran wajib 8000 x 2000 px, maksimal 10 MB.</p>
+                    <p class="mt-2 text-xs text-neutral-500">Kosongkan jika poster tidak ingin diganti. Rasio wajib 4:1, rekomendasi 8000 x 2000 px, maksimal 10 MB.</p>
                 </div>
             </aside>
         </div>

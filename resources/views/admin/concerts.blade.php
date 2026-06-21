@@ -25,6 +25,7 @@
                         <th>Stok</th>
                         <th>Status</th>
                         <th>Unggulan</th>
+                        <th>Promo</th>
                         <th class="text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -67,6 +68,13 @@
                                 @endif
                             </td>
                             <td>
+                                @if($concert->is_promo)
+                                    <span class="fi-badge-danger">Promo</span>
+                                @else
+                                    <span class="fi-badge-neutral">-</span>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="flex justify-end gap-2">
                                     <a href="{{ route('admin.concerts.edit', $concert) }}" class="fi-btn-primary">Edit</a>
                                     <form method="post" action="{{ route('admin.concerts.destroy',$concert) }}">
@@ -78,7 +86,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="10" class="text-center text-neutral-500">Belum ada konser.</td></tr>
+                        <tr><td colspan="11" class="text-center text-neutral-500">Belum ada konser.</td></tr>
                     @endforelse
                 </tbody>
             </table>

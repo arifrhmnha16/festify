@@ -438,13 +438,15 @@ class AdminController extends Controller
             'venue' => ['required', 'string', 'max:150'],
             'date' => ['required', 'date'],
             'time' => ['required'],
-            'poster' => ['nullable', 'image', 'dimensions:width=8000,height=2000', 'max:10240'],
+            'poster' => ['nullable', 'image', 'dimensions:ratio=4/1', 'max:10240'],
             'price' => ['required', 'integer', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'status' => ['required', 'in:aktif,selesai,dibatalkan'],
+            'is_promo' => ['nullable', 'boolean'],
         ]);
 
         $data['seat_zone'] = 'Festival Tengah';
+        $data['is_promo'] = $request->boolean('is_promo');
 
         if ($request->hasFile('poster')) {
             if ($concert?->poster) {

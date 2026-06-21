@@ -27,12 +27,22 @@
     </header>
 
     <nav class="sticky top-0 z-40 hidden border-b border-neutral-200 bg-white/95 backdrop-blur md:block">
-        <div class="mx-auto max-w-6xl px-4 py-3">
-            <div class="flex items-center justify-between gap-5">
-                <a href="{{ route('home') }}" class="block h-10 w-36 shrink-0 overflow-hidden rounded-md" aria-label="Festify">
+        <div class="mx-auto max-w-6xl px-4 py-2.5">
+            <div class="flex items-center justify-between gap-4">
+                <a href="{{ route('home') }}" class="block h-9 w-32 shrink-0 overflow-hidden rounded-md" aria-label="Festify">
                     <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
                 </a>
-                <div class="flex items-center gap-5 text-sm font-semibold">
+                <form action="{{ route('concerts.index') }}" class="hidden min-w-0 flex-1 items-center rounded-xl bg-neutral-100 px-3.5 py-2.5 lg:flex">
+                    <input name="q" value="{{ request('q') }}" class="min-w-0 flex-1 bg-transparent text-sm font-semibold text-blue-950 outline-none placeholder:font-normal placeholder:text-neutral-500" placeholder="Cari event konser musik">
+                    <span class="mx-2.5 h-5 w-px bg-neutral-300"></span>
+                    <input name="venue" value="{{ request('venue') }}" class="w-24 bg-transparent text-sm font-semibold text-blue-950 outline-none placeholder:font-normal placeholder:text-neutral-500 xl:w-32" placeholder="Lokasi">
+                    <span class="mx-2.5 h-5 w-px bg-neutral-300"></span>
+                    <input type="date" name="date" value="{{ request('date') }}" class="w-[7.5rem] bg-transparent text-sm font-semibold text-blue-950 outline-none xl:w-[8.5rem]">
+                    <button class="ml-2.5 shrink-0 text-neutral-700 hover:text-orange-700" aria-label="Cari konser">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    </button>
+                </form>
+                <div class="flex items-center gap-4 text-sm font-semibold">
                     <a href="{{ route('home') }}" class="hover:text-orange-700">Beranda</a>
                     <a href="{{ route('concerts.index') }}" class="hover:text-orange-700">Konser</a>
                     <a href="{{ route('home') }}#cara-kerja" class="hover:text-orange-700">Cara Kerja</a>
@@ -52,12 +62,6 @@
                     @endif
                 </div>
             </div>
-            <form action="{{ route('concerts.index') }}" class="mt-3 grid items-center gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-sm lg:grid-cols-[1fr_220px_220px_86px]">
-                <input name="q" value="{{ request('q') }}" class="min-w-0 rounded-lg border border-transparent bg-neutral-50 px-5 py-4 text-base outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
-                <input name="venue" value="{{ request('venue') }}" class="rounded-lg border border-transparent bg-neutral-50 px-5 py-4 text-base outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200" placeholder="Lokasi">
-                <input type="date" name="date" value="{{ request('date') }}" class="rounded-lg border border-transparent bg-neutral-50 px-5 py-4 text-base outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200">
-                <button class="rounded-lg bg-orange-700 px-5 py-4 text-base font-black text-white transition hover:bg-orange-800">Cari</button>
-            </form>
         </div>
     </nav>
 
