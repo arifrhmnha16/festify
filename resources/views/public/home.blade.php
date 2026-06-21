@@ -8,80 +8,77 @@
 @endphp
 
 <section class="bg-white">
-    <div class="mx-auto max-w-6xl px-4 py-6 md:py-8">
-        <div class="relative overflow-hidden rounded-lg border border-neutral-200 bg-neutral-950 shadow-sm" data-promo-slider>
+    <div class="px-0 py-1 md:px-1">
+        <div class="relative overflow-hidden border-y border-neutral-200 bg-neutral-950 shadow-sm" data-promo-slider>
             <div class="flex transition-transform duration-500 ease-out" data-promo-track>
                 @forelse($bannerConcerts as $concert)
                     <article class="relative min-w-full">
-                        <div class="grid min-h-[430px] overflow-hidden md:grid-cols-[1.05fr_.95fr]">
-                            <div class="relative flex items-center px-6 py-10 text-white md:px-10 lg:px-12">
-                                <div class="absolute inset-0 bg-[linear-gradient(135deg,#111827_0%,#431407_48%,#7c2d12_100%)]"></div>
-                                <div class="relative z-10 max-w-xl">
-                                    <p class="text-xs font-black uppercase tracking-widest text-orange-200">
-                                        @auth
-                                            Selamat datang, {{ auth()->user()->name }}
-                                        @else
-                                            Promo Konser Festify
-                                        @endauth
-                                    </p>
-                                    <h1 class="mt-4 text-[34px] font-black leading-tight md:text-[42px] lg:text-[48px]">{{ $concert->name }}</h1>
-                                    <p class="mt-3 text-lg font-bold text-orange-100">{{ $concert->artist }}</p>
-                                    <div class="mt-6 grid gap-3 text-sm font-bold text-neutral-100 sm:grid-cols-2">
-                                        <p class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">{{ $concert->venue }}</p>
-                                        <p class="rounded-lg border border-white/15 bg-white/10 px-4 py-3">{{ $concert->date->format('d M Y') }} - {{ substr($concert->time, 0, 5) }} WIB</p>
+                        <div class="relative min-h-[470px] overflow-hidden md:min-h-[520px]">
+                            @if($concert->poster)
+                                <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="absolute inset-0 h-full w-full object-cover">
+                            @else
+                                <img src="{{ asset('logofest.png') }}" alt="Festify" class="absolute inset-0 h-full w-full object-cover opacity-80">
+                            @endif
+                            <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,24,39,.88)_0%,rgba(67,20,7,.62)_38%,rgba(17,24,39,.18)_100%)]"></div>
+                            <div class="absolute inset-x-0 top-0 z-10 mx-auto flex max-w-7xl items-start justify-between px-7 py-8 text-white md:px-10">
+                                <div>
+                                    <p class="text-lg font-black uppercase tracking-wider">Festify</p>
+                                    <p class="text-xs font-black uppercase tracking-[0.32em] text-orange-200">Live</p>
+                                </div>
+                                <p class="hidden rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-widest backdrop-blur md:block">
+                                    @auth
+                                        Halo, {{ auth()->user()->name }}
+                                    @else
+                                        Promo Konser
+                                    @endauth
+                                </p>
+                            </div>
+                            <div class="relative z-10 mx-auto flex min-h-[470px] max-w-7xl items-center px-7 pb-24 pt-24 text-white md:min-h-[520px] md:px-10">
+                                <div class="max-w-3xl">
+                                    <h1 class="text-[44px] font-black leading-[.98] tracking-wide md:text-[72px] lg:text-[88px]">{{ $concert->name }}</h1>
+                                    <p class="mt-5 text-xl font-bold text-neutral-100 md:text-2xl">with {{ $concert->artist }}</p>
+                                    <div class="mt-9 grid max-w-4xl gap-6 text-lg font-bold text-neutral-100 md:grid-cols-3 md:text-2xl">
+                                        <p>{{ $concert->date->format('F d') }}</p>
+                                        <p>{{ $concert->venue }}</p>
+                                        <p>{{ substr($concert->time, 0, 5) }} WIB</p>
                                     </div>
-                                    <div class="mt-7 flex flex-wrap items-center gap-3">
-                                        <a href="{{ route('concerts.show', $concert) }}" class="rounded-full bg-white px-6 py-3 text-sm font-black text-neutral-950">Amankan Tiket</a>
-                                        <a href="{{ route('concerts.index') }}" class="rounded-full border border-white/30 px-6 py-3 text-sm font-black text-white">Lihat Semua</a>
-                                    </div>
+                                    <p class="mt-8 text-sm font-bold uppercase tracking-widest text-neutral-200 md:text-base">Tickets available at Festify</p>
                                 </div>
                             </div>
-                            <div class="relative min-h-[260px] bg-neutral-900 md:min-h-full">
-                                @if($concert->poster)
-                                    <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="h-full w-full object-cover">
-                                @else
-                                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover opacity-80">
-                                @endif
-                                <div class="absolute inset-0 bg-gradient-to-t from-neutral-950/50 via-transparent to-transparent md:bg-gradient-to-r md:from-neutral-950/40"></div>
-                                <div class="absolute bottom-5 left-5 rounded-lg bg-white/90 px-4 py-3 text-neutral-950 shadow-sm">
-                                    <p class="text-xs font-bold text-neutral-500">Mulai dari</p>
-                                    <p class="text-xl font-black">Rp{{ number_format($concert->price, 0, ',', '.') }}</p>
-                                </div>
-                            </div>
+                            <a href="{{ route('concerts.show', $concert) }}" class="absolute bottom-8 left-1/2 z-20 flex w-[min(720px,calc(100%-2rem))] -translate-x-1/2 items-center justify-between gap-4 rounded-xl bg-white/85 px-5 py-4 text-base font-black text-neutral-950 shadow-lg backdrop-blur md:text-xl">
+                                <span class="truncate">Nonton {{ $concert->name }}! <span class="text-blue-700">Dapetin tiketnya di sini!</span></span>
+                                <svg class="h-7 w-7 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            </a>
                         </div>
                     </article>
                 @empty
                     <article class="relative min-w-full">
-                        <div class="grid min-h-[430px] overflow-hidden md:grid-cols-[1.05fr_.95fr]">
-                            <div class="relative flex items-center px-6 py-10 text-white md:px-10 lg:px-12">
-                                <div class="absolute inset-0 bg-[linear-gradient(135deg,#111827_0%,#431407_48%,#7c2d12_100%)]"></div>
-                                <div class="relative z-10 max-w-xl">
-                                    <p class="text-xs font-black uppercase tracking-widest text-orange-200">Promo Konser Festify</p>
-                                    <h1 class="mt-4 text-[34px] font-black leading-tight md:text-[42px] lg:text-[48px]">Temukan Konser Favoritmu</h1>
-                                    <p class="mt-4 text-base leading-7 text-orange-100">Pesan tiket, terima E-Ticket QR, tukar gelang, dan masuk venue lebih cepat.</p>
-                                    <a href="{{ route('concerts.index') }}" class="mt-7 inline-flex rounded-full bg-white px-6 py-3 text-sm font-black text-neutral-950">Lihat Konser</a>
+                        <div class="relative min-h-[470px] overflow-hidden md:min-h-[520px]">
+                            <img src="{{ asset('logofest.png') }}" alt="Festify" class="absolute inset-0 h-full w-full object-cover opacity-80">
+                            <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(17,24,39,.88)_0%,rgba(67,20,7,.62)_48%,rgba(17,24,39,.18)_100%)]"></div>
+                            <div class="relative z-10 mx-auto flex min-h-[470px] max-w-7xl items-center px-7 pb-24 pt-24 text-white md:min-h-[520px] md:px-10">
+                                <div class="max-w-3xl">
+                                    <p class="text-xs font-black uppercase tracking-widest text-orange-200">Festify Live</p>
+                                    <h1 class="mt-4 text-[44px] font-black leading-[.98] md:text-[76px]">Temukan Konser Favoritmu</h1>
+                                    <p class="mt-5 text-xl font-bold text-neutral-100">Pesan tiket, terima E-Ticket QR, tukar gelang, dan masuk venue lebih cepat.</p>
                                 </div>
                             </div>
-                            <div class="min-h-[260px] bg-neutral-900">
-                                <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover opacity-80">
-                            </div>
+                            <a href="{{ route('concerts.index') }}" class="absolute bottom-8 left-1/2 z-20 flex w-[min(620px,calc(100%-2rem))] -translate-x-1/2 items-center justify-center rounded-xl bg-white/85 px-5 py-4 text-base font-black text-neutral-950 shadow-lg backdrop-blur md:text-xl">Lihat konser tersedia</a>
                         </div>
                     </article>
                 @endforelse
             </div>
 
             @if($bannerConcerts->count() > 1)
-                <div class="absolute bottom-5 right-5 flex items-center gap-2">
-                    <button type="button" class="grid h-10 w-10 place-items-center rounded-full border border-white/25 bg-white/15 text-white backdrop-blur hover:bg-white/25" data-promo-prev aria-label="Slide sebelumnya">
+                <button type="button" class="absolute left-5 top-1/2 z-30 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white text-neutral-900 shadow-lg transition hover:scale-105" data-promo-prev aria-label="Slide sebelumnya">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-                    </button>
-                    <button type="button" class="grid h-10 w-10 place-items-center rounded-full border border-white/25 bg-white/15 text-white backdrop-blur hover:bg-white/25" data-promo-next aria-label="Slide berikutnya">
+                </button>
+                <button type="button" class="absolute right-5 top-1/2 z-30 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white text-neutral-900 shadow-lg transition hover:scale-105" data-promo-next aria-label="Slide berikutnya">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-                    </button>
-                </div>
-                <div class="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2" data-promo-dots>
+                </button>
+                <div class="absolute bottom-10 left-7 z-30 flex gap-3 md:left-10" data-promo-dots>
                     @foreach($bannerConcerts as $concert)
-                        <button type="button" class="h-2.5 w-2.5 rounded-full bg-white/40 transition data-[active=true]:w-8 data-[active=true]:bg-white" data-promo-dot data-active="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $loop->iteration }}"></button>
+                        <button type="button" class="h-2 w-2 rounded-full bg-white/40 transition data-[active=true]:h-4 data-[active=true]:w-4 data-[active=true]:bg-white" data-promo-dot data-active="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $loop->iteration }}"></button>
                     @endforeach
                 </div>
             @endif

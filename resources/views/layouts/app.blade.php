@@ -19,9 +19,9 @@
                     <a href="{{ route('login') }}" class="rounded-full border border-neutral-300 px-4 py-2 text-xs font-bold">Login</a>
                 @endauth
             </div>
-            <form action="{{ route('concerts.index') }}" class="mt-3 grid grid-cols-[1fr_auto] gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-2">
-                <input name="q" value="{{ request('q') }}" class="min-w-0 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
-                <button class="rounded-md bg-orange-700 px-4 py-2 text-sm font-bold text-white">Cari</button>
+            <form action="{{ route('concerts.index') }}" class="mt-3 grid grid-cols-[1fr_auto] gap-2 rounded-xl border border-neutral-200 bg-white p-2 shadow-sm">
+                <input name="q" value="{{ request('q') }}" class="min-w-0 rounded-lg border border-transparent bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
+                <button class="rounded-lg bg-orange-700 px-5 py-3 text-sm font-black text-white hover:bg-orange-800">Cari</button>
             </form>
         </div>
     </header>
@@ -32,12 +32,6 @@
                 <a href="{{ route('home') }}" class="block h-10 w-36 shrink-0 overflow-hidden rounded-md" aria-label="Festify">
                     <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
                 </a>
-                <form action="{{ route('concerts.index') }}" class="hidden min-w-0 flex-1 items-center rounded-lg border border-neutral-200 bg-neutral-50 p-1.5 lg:flex">
-                    <input name="q" value="{{ request('q') }}" class="min-w-0 flex-1 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
-                    <input name="venue" value="{{ request('venue') }}" class="ml-1 w-36 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200" placeholder="Lokasi">
-                    <input type="date" name="date" value="{{ request('date') }}" class="ml-1 w-36 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200">
-                    <button class="ml-1 rounded-md bg-orange-700 px-4 py-2 text-sm font-bold text-white hover:bg-orange-800">Cari</button>
-                </form>
                 <div class="flex items-center gap-5 text-sm font-semibold">
                     <a href="{{ route('home') }}" class="hover:text-orange-700">Beranda</a>
                     <a href="{{ route('concerts.index') }}" class="hover:text-orange-700">Konser</a>
@@ -58,6 +52,12 @@
                     @endif
                 </div>
             </div>
+            <form action="{{ route('concerts.index') }}" class="mt-3 grid items-center gap-1 rounded-xl border border-neutral-200 bg-white p-2 shadow-sm lg:grid-cols-[1fr_220px_220px_86px]">
+                <input name="q" value="{{ request('q') }}" class="min-w-0 rounded-lg border border-transparent bg-neutral-50 px-5 py-4 text-base outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
+                <input name="venue" value="{{ request('venue') }}" class="rounded-lg border border-transparent bg-neutral-50 px-5 py-4 text-base outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200" placeholder="Lokasi">
+                <input type="date" name="date" value="{{ request('date') }}" class="rounded-lg border border-transparent bg-neutral-50 px-5 py-4 text-base outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200">
+                <button class="rounded-lg bg-orange-700 px-5 py-4 text-base font-black text-white transition hover:bg-orange-800">Cari</button>
+            </form>
         </div>
     </nav>
 
