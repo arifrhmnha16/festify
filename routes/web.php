@@ -49,6 +49,7 @@ Route::middleware(['role:user', 'verified'])->prefix('user')->name('user.')->gro
     Route::get('/payments/{order}', [UserAreaController::class, 'payment'])->name('payments.show');
     Route::post('/payments/{order}', [UserAreaController::class, 'submitPayment'])->name('payments.submit');
     Route::get('/e-tickets', [UserAreaController::class, 'tickets'])->name('tickets');
+    Route::get('/e-tickets/{ticket}/download', [UserAreaController::class, 'downloadTicket'])->name('tickets.download');
     Route::get('/e-tickets/{ticket}', [UserAreaController::class, 'ticket'])->name('tickets.show');
 });
 
@@ -95,6 +96,7 @@ Route::middleware('role:loket')->prefix('loket')->name('loket.')->group(function
     Route::get('/scan-eticket', [OfficerController::class, 'scanEticket'])->name('scan');
     Route::post('/scan-eticket', [OfficerController::class, 'exchange'])->name('scan.submit');
     Route::get('/exchange/{ticket_code}', [OfficerController::class, 'exchange'])->name('exchange');
+    Route::get('/wristbands/{wristband}/download', [OfficerController::class, 'downloadWristband'])->name('wristbands.download');
 });
 
 Route::middleware('role:gate')->prefix('gate')->name('gate.')->group(function () {

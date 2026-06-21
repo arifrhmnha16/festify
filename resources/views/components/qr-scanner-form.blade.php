@@ -13,6 +13,7 @@
 
     <div class="rounded-lg border border-neutral-200 bg-neutral-950 p-3">
         <video class="hidden aspect-video w-full rounded-md bg-black object-cover" playsinline muted></video>
+        <canvas class="hidden"></canvas>
         <div class="grid aspect-video place-items-center rounded-md bg-neutral-900 text-center text-sm font-bold text-neutral-300" data-camera-placeholder>
             Kamera scanner belum aktif
         </div>
@@ -37,6 +38,8 @@
     if (!form) return;
 
     const video = form.querySelector('video');
+    const canvas = form.querySelector('canvas');
+    const canvasContext = canvas.getContext('2d', { willReadFrequently: true });
     const placeholder = form.querySelector('[data-camera-placeholder]');
     const status = form.querySelector('[data-scan-status]');
     const input = form.querySelector('[data-code-input]');
@@ -58,20 +61,37 @@
         status.textContent = 'Scanner berhenti. Kode masih bisa dimasukkan manual.';
     };
 
+    const detectWithJsQR = () => {
+        if (!window.jsQR || video.readyState !== video.HAVE_ENOUGH_DATA) return '';
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+        const code = window.jsQR(imageData.data, imageData.width, imageData.height);
+
+        return code?.data || '';
+    };
+
     const scanLoop = async () => {
-        if (!scanning || !detector) return;
+        if (!scanning) return;
 
         try {
-            const codes = await detector.detect(video);
-            if (codes.length > 0) {
-                const value = codes[0].rawValue || '';
-                if (value.trim() !== '') {
-                    input.value = value.trim();
-                    status.textContent = 'QR terbaca. Memproses kode...';
-                    stop();
-                    form.submit();
-                    return;
-                }
+            let value = '';
+
+            if (detector) {
+                const codes = await detector.detect(video);
+                value = codes[0]?.rawValue || '';
+            } else {
+                value = detectWithJsQR();
+            }
+
+            if (value.trim() !== '') {
+                input.value = value.trim();
+                status.textContent = 'QR terbaca. Memproses kode...';
+                stop();
+                form.submit();
+                return;
             }
         } catch (error) {
             status.textContent = 'Scanner belum menemukan QR. Arahkan kamera ke kode.';
@@ -81,23 +101,28 @@
     };
 
     startButton.addEventListener('click', async () => {
-        if (!('BarcodeDetector' in window)) {
-            status.textContent = 'Browser belum mendukung scan kamera. Masukkan kode manual.';
+        if (!navigator.mediaDevices?.getUserMedia) {
+            status.textContent = 'Browser tidak mengizinkan kamera. Pakai localhost/HTTPS atau masukkan kode manual.';
             return;
         }
 
         try {
-            detector = new BarcodeDetector({ formats: ['qr_code'] });
-            stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            detector = 'BarcodeDetector' in window ? new BarcodeDetector({ formats: ['qr_code'] }) : null;
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+                audio: false
+            }).catch(() => navigator.mediaDevices.getUserMedia({ video: true, audio: false }));
             video.srcObject = stream;
             await video.play();
             scanning = true;
             video.classList.remove('hidden');
             placeholder.classList.add('hidden');
-            status.textContent = 'Scanner aktif. Arahkan kamera ke QR Code.';
+            status.textContent = detector
+                ? 'Scanner aktif. Arahkan kamera ke QR Code.'
+                : 'Scanner aktif mode kompatibel. Arahkan kamera ke QR Code.';
             requestAnimationFrame(scanLoop);
         } catch (error) {
-            status.textContent = 'Kamera tidak bisa dibuka. Cek izin kamera atau masukkan kode manual.';
+            status.textContent = `Kamera tidak bisa dibuka (${error.name || 'Error'}). Cek izin kamera browser atau masukkan kode manual.`;
         }
     });
 

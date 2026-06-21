@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class UserAreaController extends Controller
 {
@@ -137,6 +138,21 @@ class UserAreaController extends Controller
         abort_if($ticket->user_id !== Auth::id(), 403);
         $ticket->load('concert.ticketZones', 'order.ticketZone', 'user', 'wristband');
         return view('user.e-ticket-show', compact('ticket'));
+    }
+
+    public function downloadTicket(Request $request, ETicket $ticket)
+    {
+        abort_if($ticket->user_id !== Auth::id(), 403);
+        $ticket->load('concert', 'order.ticketZone', 'user', 'wristband');
+
+        $pdf = Pdf::loadView('pdf.e-ticket', compact('ticket'))->setPaper('a4');
+        $filename = $ticket->ticket_code.'.pdf';
+
+        if ($request->query('mode') === 'print') {
+            return $pdf->stream($filename);
+        }
+
+        return $pdf->download($filename);
     }
 
     private function own(Order $order): void

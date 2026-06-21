@@ -7,7 +7,9 @@ use App\Models\ScanHistory;
 use App\Models\Wristband;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OfficerController extends Controller
 {
@@ -35,20 +37,34 @@ class OfficerController extends Controller
 
         if ($ticket && $ticket->order->payment?->payment_status !== 'success') {
             $message = 'Pembayaran belum berhasil.';
-        } elseif ($ticket && $ticket->ticket_status !== 'belum_ditukar') {
-            $message = 'E-Ticket sudah pernah ditukar atau invalid.';
         } elseif ($ticket && $ticket->concert->date->toDateString() !== now()->toDateString()) {
             $message = 'Konser tidak sesuai hari ini.';
+        } elseif ($ticket && $ticket->wristband) {
+            if ($ticket->ticket_status === 'belum_ditukar') {
+                $ticket->update(['ticket_status' => 'sudah_ditukar', 'exchanged_at' => $ticket->exchanged_at ?? now()]);
+                $ticket->load('wristband');
+            }
+            $message = 'E-Ticket sudah memiliki gelang. Silakan cetak/download gelang yang sudah ada.';
+            $success = true;
+        } elseif ($ticket && $ticket->ticket_status !== 'belum_ditukar') {
+            $message = 'E-Ticket sudah pernah ditukar atau invalid.';
         } elseif ($ticket) {
-            $wristbandCode = 'GLG-'.now()->format('ymd').'-'.Str::upper(Str::random(8));
-            $ticket->update(['ticket_status' => 'sudah_ditukar', 'exchanged_at' => now()]);
-            $ticket->wristband()->create([
-                'concert_id' => $ticket->concert_id,
-                'wristband_code' => $wristbandCode,
-                'wristband_qr_code' => $wristbandCode,
-                'activated_at' => now(),
-            ]);
-            $ticket->load('order.ticketZone', 'wristband');
+            DB::transaction(function () use ($ticket) {
+                $lockedTicket = ETicket::with('wristband')->lockForUpdate()->findOrFail($ticket->id);
+
+                if (! $lockedTicket->wristband) {
+                    $wristbandCode = 'GLG-'.now()->format('ymd').'-'.Str::upper(Str::random(8));
+                    $lockedTicket->wristband()->create([
+                        'concert_id' => $lockedTicket->concert_id,
+                        'wristband_code' => $wristbandCode,
+                        'wristband_qr_code' => $wristbandCode,
+                        'activated_at' => now(),
+                    ]);
+                }
+
+                $lockedTicket->update(['ticket_status' => 'sudah_ditukar', 'exchanged_at' => $lockedTicket->exchanged_at ?? now()]);
+            });
+            $ticket->refresh()->load('order.ticketZone', 'wristband');
             $message = 'Penukaran berhasil. Gelang aktif.';
             $success = true;
         }
@@ -91,6 +107,20 @@ class OfficerController extends Controller
 
         $this->history('scan_gelang', $success, $message, null, $wristband?->id);
         return view('gate.result', compact('wristband', 'message', 'success'));
+    }
+
+    public function downloadWristband(Request $request, Wristband $wristband)
+    {
+        $wristband->load('concert', 'eTicket.user', 'eTicket.order.ticketZone');
+
+        $pdf = Pdf::loadView('pdf.wristband', compact('wristband'))->setPaper([0, 0, 720, 144], 'landscape');
+        $filename = $wristband->wristband_code.'.pdf';
+
+        if ($request->query('mode') === 'print') {
+            return $pdf->stream($filename);
+        }
+
+        return $pdf->download($filename);
     }
 
     private function history(string $type, bool $success, string $message, ?int $ticketId, ?int $wristbandId): void

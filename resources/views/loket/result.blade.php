@@ -2,7 +2,7 @@
 @section('content')
 <style>
     @media print {
-        @page { size: landscape; margin: 8mm; }
+        @page { size: 254mm 51mm; margin: 0; }
         body { background: white !important; }
         body * { visibility: hidden; }
         #wristband-print, #wristband-print * { visibility: visible; }
@@ -10,6 +10,7 @@
             position: fixed;
             inset: 0;
             width: 100%;
+            height: 100%;
             margin: 0;
             box-shadow: none !important;
             border: 1px solid #111 !important;
@@ -18,10 +19,10 @@
     }
 </style>
 
-<section class="mx-auto max-w-6xl px-4 py-12">
-    <div class="rounded-lg border bg-white p-8">
+<section class="mx-auto max-w-6xl px-4 py-10">
+    <div class="rounded-lg border bg-white p-6 md:p-8">
         <p class="text-sm font-bold uppercase {{ $success ? 'text-green-700' : 'text-red-700' }}">{{ $success ? 'Berhasil' : 'Ditolak' }}</p>
-        <h1 class="mt-2 text-4xl font-black">{{ $message }}</h1>
+        <h1 class="mt-2 max-w-5xl text-3xl font-black leading-tight md:text-4xl">{{ $message }}</h1>
 
         @if($ticket)
             <div class="mt-4 grid gap-2 text-sm text-neutral-600 md:grid-cols-2">
@@ -33,13 +34,14 @@
         @endif
 
         @if($success && $ticket?->wristband)
-            <div id="wristband-print" class="mt-8 overflow-hidden rounded-lg border-2 border-neutral-950 bg-white shadow-sm">
-                <div class="grid min-h-[220px] grid-cols-[90px_180px_1fr_160px_1fr_90px] items-stretch">
+            <div class="mt-8 overflow-x-auto pb-2">
+            <div id="wristband-print" class="w-[960px] overflow-hidden rounded-lg border-2 border-neutral-950 bg-white shadow-sm">
+                <div class="grid h-[192px] grid-cols-[54px_168px_270px_148px_266px_54px] items-stretch">
                     <div class="flex items-center justify-center bg-neutral-950 text-white">
-                        <div class="-rotate-90 whitespace-nowrap text-xs font-black uppercase tracking-[0.35em]">Festify Access</div>
+                        <div class="-rotate-90 whitespace-nowrap text-[9px] font-black uppercase tracking-[0.32em]">Festify Access</div>
                     </div>
 
-                    <div class="border-r border-dashed border-neutral-300 bg-neutral-900 p-3">
+                    <div class="border-r border-dashed border-neutral-300 bg-neutral-900 p-2.5">
                         <div class="grid h-full place-items-center overflow-hidden rounded-md bg-neutral-950">
                             @if($ticket->concert->poster)
                                 <img src="{{ asset('storage/'.$ticket->concert->poster) }}" alt="{{ $ticket->concert->name }}" class="max-h-full max-w-full object-contain">
@@ -51,52 +53,54 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col justify-between border-r border-dashed border-neutral-300 p-5">
+                    <div class="flex flex-col justify-between border-r border-dashed border-neutral-300 p-4">
                         <div>
-                            <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-10 w-36 rounded-md object-cover object-center">
-                            <p class="mt-3 text-xs font-black uppercase tracking-widest text-orange-700">Wristband</p>
-                            <h2 class="mt-2 text-3xl font-black leading-tight">{{ $ticket->concert->name }}</h2>
-                            <p class="mt-2 text-sm text-neutral-600">{{ $ticket->concert->venue }} - {{ $ticket->concert->date->format('d M Y') }}</p>
+                            <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-8 w-28 rounded-md object-cover object-center">
+                            <p class="mt-2 text-[9px] font-black uppercase tracking-[0.2em] text-orange-700">Wristband</p>
+                            <h2 class="mt-1.5 line-clamp-2 text-lg font-black leading-tight">{{ $ticket->concert->name }}</h2>
+                            <p class="mt-1.5 line-clamp-1 text-[10px] text-neutral-600">{{ $ticket->concert->venue }} - {{ $ticket->concert->date->format('d M Y') }}</p>
                         </div>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div class="rounded border border-neutral-200 p-2">
+                        <div class="grid grid-cols-2 gap-2 text-[10px]">
+                            <div class="rounded border border-neutral-200 p-1.5">
                                 <p class="text-neutral-500">Area</p>
-                                <p class="font-black">{{ $ticket->order->ticketZone?->name ?? '-' }}</p>
+                                <p class="line-clamp-1 font-black">{{ $ticket->order->ticketZone?->name ?? '-' }}</p>
                             </div>
-                            <div class="rounded border border-neutral-200 p-2">
+                            <div class="rounded border border-neutral-200 p-1.5">
                                 <p class="text-neutral-500">Status</p>
-                                <p class="font-black">{{ $ticket->wristband->wristband_status }}</p>
+                                <p class="line-clamp-1 font-black">{{ $ticket->wristband->wristband_status }}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center gap-3 border-r border-dashed border-neutral-300 bg-stone-50 p-4">
-                        <div class="rounded bg-white p-3 shadow-sm">
-                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(118)->generate($ticket->wristband->wristband_code) !!}
+                    <div class="flex flex-col items-center justify-center gap-2 border-r border-dashed border-neutral-300 bg-stone-50 p-2.5">
+                        <div class="rounded bg-white p-2 shadow-sm">
+                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(96)->generate($ticket->wristband->wristband_code) !!}
                         </div>
-                        <p class="font-mono text-xs font-bold">{{ $ticket->wristband->wristband_code }}</p>
+                        <p class="font-mono text-[9px] font-black">{{ $ticket->wristband->wristband_code }}</p>
                     </div>
 
-                    <div class="flex flex-col justify-between p-5">
+                    <div class="flex flex-col justify-between p-4">
                         <div>
-                            <p class="text-xs font-black uppercase tracking-widest text-orange-700">Holder</p>
-                            <h3 class="mt-2 text-2xl font-black">{{ $ticket->user->name }}</h3>
-                            <p class="mt-2 font-mono text-sm text-neutral-600">{{ $ticket->ticket_code }}</p>
+                            <p class="text-[9px] font-black uppercase tracking-[0.24em] text-orange-700">Holder</p>
+                            <h3 class="mt-2 line-clamp-1 text-xl font-black">{{ $ticket->user->name }}</h3>
+                            <p class="mt-2 font-mono text-[10px] text-neutral-600">{{ $ticket->ticket_code }}</p>
                         </div>
-                        <div class="rounded-lg bg-neutral-950 p-4 text-white">
-                            <p class="text-xs uppercase tracking-widest text-orange-200">Gate validation</p>
-                            <p class="mt-1 text-sm font-bold">Scan QR gelang satu kali di gate masuk.</p>
+                        <div class="rounded-md bg-neutral-950 p-3 text-white">
+                            <p class="text-[9px] uppercase tracking-[0.18em] text-orange-200">Gate validation</p>
+                            <p class="mt-1 text-[11px] font-bold leading-snug">Scan QR gelang satu kali di gate masuk.</p>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-center bg-orange-700 text-white">
-                        <div class="-rotate-90 whitespace-nowrap text-xs font-black uppercase tracking-[0.35em]">Valid Entry</div>
+                        <div class="-rotate-90 whitespace-nowrap text-[9px] font-black uppercase tracking-[0.32em]">Valid Entry</div>
                     </div>
                 </div>
             </div>
+            </div>
 
             <div class="no-print mt-6 flex flex-wrap gap-3">
-                <button onclick="window.print()" class="rounded-full bg-neutral-950 px-6 py-3 font-bold text-white">Cetak Gelang</button>
+                <a href="{{ route('loket.wristbands.download', $ticket->wristband) }}" class="rounded-full bg-neutral-950 px-6 py-3 font-bold text-white">Download PDF</a>
+                <a href="{{ route('loket.wristbands.download', ['wristband' => $ticket->wristband, 'mode' => 'print']) }}" class="rounded-full border px-6 py-3 font-bold">Cetak Gelang</a>
                 <a class="rounded-full border px-6 py-3 font-bold" href="{{ route('loket.scan') }}">Scan Lagi</a>
             </div>
         @else
