@@ -8,44 +8,55 @@
 </head>
 <body class="bg-stone-50 pb-24 text-neutral-950 antialiased md:pb-0">
     <header class="sticky top-0 z-40 border-b border-neutral-200 bg-white/95 px-4 py-3 backdrop-blur md:hidden print:hidden">
-        <div class="mx-auto flex max-w-md items-center justify-between gap-3">
-            <a href="{{ route('home') }}" class="block h-10 w-36 overflow-hidden rounded-md" aria-label="Festify">
-                <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
-            </a>
-            @auth
-                <p class="truncate text-right text-xs font-bold text-neutral-600">Halo, {{ auth()->user()->name }}</p>
-            @else
-                <a href="{{ route('login') }}" class="rounded-full border border-neutral-300 px-4 py-2 text-xs font-bold">Login</a>
-            @endauth
+        <div class="mx-auto max-w-md">
+            <div class="flex items-center justify-between gap-3">
+                <a href="{{ route('home') }}" class="block h-10 w-36 overflow-hidden rounded-md" aria-label="Festify">
+                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
+                </a>
+                @auth
+                    <p class="truncate text-right text-xs font-bold text-neutral-600">Halo, {{ auth()->user()->name }}</p>
+                @else
+                    <a href="{{ route('login') }}" class="rounded-full border border-neutral-300 px-4 py-2 text-xs font-bold">Login</a>
+                @endauth
+            </div>
+            <form action="{{ route('concerts.index') }}" class="mt-3 grid grid-cols-[1fr_auto] gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-2">
+                <input name="q" value="{{ request('q') }}" class="min-w-0 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
+                <button class="rounded-md bg-orange-700 px-4 py-2 text-sm font-bold text-white">Cari</button>
+            </form>
         </div>
     </header>
 
     <nav class="sticky top-0 z-40 hidden border-b border-neutral-200 bg-white/95 backdrop-blur md:block">
-        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-            <a href="{{ route('home') }}" class="block h-10 w-36 overflow-hidden rounded-md" aria-label="Festify">
-                <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
-            </a>
-            <div class="hidden items-center gap-6 text-sm font-semibold md:flex">
-                <a href="{{ route('home') }}" class="hover:text-orange-700">Beranda</a>
-                <a href="{{ route('concerts.index') }}" class="hover:text-orange-700">Konser</a>
-                <a href="{{ route('home') }}#cara-kerja" class="hover:text-orange-700">Cara Kerja</a>
-                @auth
-                    <a href="{{ route('user.tickets') }}" class="rounded-full bg-orange-700 px-4 py-2 font-bold text-white hover:bg-orange-800">Tiket Saya</a>
-                @endauth
-                @if(auth('admin')->check())
-                    <a href="{{ route('admin.dashboard') }}" class="hover:text-orange-700">Admin</a>
-                @endif
-                @if(auth('officer')->check())
-                    <a href="{{ auth('officer')->user()->role === 'loket' ? route('loket.dashboard') : route('gate.dashboard') }}" class="hover:text-orange-700">Petugas</a>
-                @endif
-            </div>
-            <div class="flex items-center gap-2">
-                @if(auth()->check() || auth('admin')->check() || auth('officer')->check())
-                    <form method="post" action="{{ route('logout') }}">@csrf<button class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold">Logout</button></form>
-                @else
-                    <a href="{{ route('login') }}" class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold">Login</a>
-                    <a href="{{ route('register') }}" class="rounded-full bg-neutral-950 px-4 py-2 text-sm font-semibold text-white">Cari Tiket</a>
-                @endif
+        <div class="mx-auto max-w-6xl px-4 py-3">
+            <div class="flex items-center justify-between gap-5">
+                <a href="{{ route('home') }}" class="block h-10 w-36 shrink-0 overflow-hidden rounded-md" aria-label="Festify">
+                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
+                </a>
+                <form action="{{ route('concerts.index') }}" class="hidden min-w-0 flex-1 items-center rounded-lg border border-neutral-200 bg-neutral-50 p-1.5 lg:flex">
+                    <input name="q" value="{{ request('q') }}" class="min-w-0 flex-1 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
+                    <input name="venue" value="{{ request('venue') }}" class="ml-1 w-36 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200" placeholder="Lokasi">
+                    <input type="date" name="date" value="{{ request('date') }}" class="ml-1 w-36 rounded-md border border-transparent bg-white px-3 py-2 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-200">
+                    <button class="ml-1 rounded-md bg-orange-700 px-4 py-2 text-sm font-bold text-white hover:bg-orange-800">Cari</button>
+                </form>
+                <div class="flex items-center gap-5 text-sm font-semibold">
+                    <a href="{{ route('home') }}" class="hover:text-orange-700">Beranda</a>
+                    <a href="{{ route('concerts.index') }}" class="hover:text-orange-700">Konser</a>
+                    <a href="{{ route('home') }}#cara-kerja" class="hover:text-orange-700">Cara Kerja</a>
+                    @auth
+                        <a href="{{ route('user.tickets') }}" class="rounded-full bg-orange-700 px-4 py-2 font-bold text-white hover:bg-orange-800">Tiket Saya</a>
+                    @endauth
+                    @if(auth('admin')->check())
+                        <a href="{{ route('admin.dashboard') }}" class="hover:text-orange-700">Admin</a>
+                    @endif
+                    @if(auth('officer')->check())
+                        <a href="{{ auth('officer')->user()->role === 'loket' ? route('loket.dashboard') : route('gate.dashboard') }}" class="hover:text-orange-700">Petugas</a>
+                    @endif
+                    @if(auth()->check() || auth('admin')->check() || auth('officer')->check())
+                        <form method="post" action="{{ route('logout') }}">@csrf<button class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold">Logout</button></form>
+                    @else
+                        <a href="{{ route('login') }}" class="rounded-full border border-neutral-300 px-4 py-2 text-sm font-semibold">Login</a>
+                    @endif
+                </div>
             </div>
         </div>
     </nav>
