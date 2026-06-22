@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -48,11 +48,26 @@ class AuthController extends Controller
         ]);
 
         $user = User::create($data);
-        event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->route('user.dashboard');
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Throwable $exception) {
+            Log::warning('Email verification delivery failed during registration.', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->route('verification.notice')
+                ->with('error', 'Akun berhasil dibuat, tapi email verifikasi belum bisa dikirim. Coba tombol kirim ulang sebentar lagi.');
+        }
+
+        return redirect()
+            ->route('verification.notice')
+            ->with('success', 'Akun berhasil dibuat. Link verifikasi sudah dikirim ke email kamu.');
     }
 
     public function login(Request $request)
@@ -169,7 +184,17 @@ class AuthController extends Controller
             return redirect()->route('user.dashboard');
         }
 
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            $request->user()->sendEmailVerificationNotification();
+        } catch (\Throwable $exception) {
+            Log::warning('Email verification resend failed.', [
+                'user_id' => $request->user()->id,
+                'email' => $request->user()->email,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return back()->with('error', 'Email verifikasi belum bisa dikirim. Coba lagi sebentar lagi.');
+        }
 
         return back()->with('success', 'Link verifikasi email sudah dikirim ulang.');
     }
