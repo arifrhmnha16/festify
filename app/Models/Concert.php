@@ -16,11 +16,21 @@ class Concert extends Model
 
     public function getPosterUrlAttribute(): ?string
     {
-        if (! $this->poster || ! Storage::disk('public')->exists($this->poster)) {
+        if (! $this->poster) {
             return null;
         }
 
-        return asset('storage/'.$this->poster);
+        $publicPoster = 'posters/'.basename($this->poster);
+
+        if (is_file(public_path($publicPoster))) {
+            return asset($publicPoster);
+        }
+
+        if (Storage::disk('public')->exists($this->poster)) {
+            return asset('storage/'.$this->poster);
+        }
+
+        return null;
     }
 
     public function orders()
