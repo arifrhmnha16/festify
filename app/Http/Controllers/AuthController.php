@@ -62,7 +62,7 @@ class AuthController extends Controller
 
             return redirect()
                 ->route('verification.notice')
-                ->with('error', 'Akun berhasil dibuat, tapi email verifikasi belum bisa dikirim. Coba tombol kirim ulang sebentar lagi.');
+                ->with('error', $this->mailFailureMessage($exception, 'Akun berhasil dibuat, tapi email verifikasi belum bisa dikirim.'));
         }
 
         return redirect()
@@ -193,10 +193,17 @@ class AuthController extends Controller
                 'error' => $exception->getMessage(),
             ]);
 
-            return back()->with('error', 'Email verifikasi belum bisa dikirim. Coba lagi sebentar lagi.');
+            return back()->with('error', $this->mailFailureMessage($exception, 'Email verifikasi belum bisa dikirim.'));
         }
 
         return back()->with('success', 'Link verifikasi email sudah dikirim ulang.');
+    }
+
+    private function mailFailureMessage(\Throwable $exception, string $prefix): string
+    {
+        $reason = Str::limit(preg_replace('/\s+/', ' ', $exception->getMessage()), 220);
+
+        return $prefix.' Detail SMTP: '.$reason;
     }
 
     public function logout(Request $request)
