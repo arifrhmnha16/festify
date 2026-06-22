@@ -15,6 +15,7 @@ class OfficerController extends Controller
 {
     public function loketDashboard()
     {
+        $today = today(config('app.timezone'))->toDateString();
         $exchanged = ETicket::where('ticket_status', 'sudah_ditukar')->count();
         $active = Wristband::where('wristband_status', 'aktif')->count();
         $histories = ScanHistory::with('officer', 'eTicket.user')
@@ -22,8 +23,8 @@ class OfficerController extends Controller
             ->latest('scanned_at')
             ->limit(8)
             ->get();
-        $todayScans = ScanHistory::where('scan_type', 'scan_eticket')->whereDate('scanned_at', today())->count();
-        $failedToday = ScanHistory::where('scan_type', 'scan_eticket')->where('scan_result', 'gagal')->whereDate('scanned_at', today())->count();
+        $todayScans = ScanHistory::where('scan_type', 'scan_eticket')->whereDate('scanned_at', $today)->count();
+        $failedToday = ScanHistory::where('scan_type', 'scan_eticket')->where('scan_result', 'gagal')->whereDate('scanned_at', $today)->count();
 
         return view('loket.dashboard', compact('exchanged', 'active', 'histories', 'todayScans', 'failedToday'));
     }
@@ -35,6 +36,7 @@ class OfficerController extends Controller
 
     public function exchange(Request $request, ?string $ticket_code = null)
     {
+        $today = today(config('app.timezone'))->toDateString();
         $code = $ticket_code ?: $request->validate(['ticket_code' => ['required', 'string']])['ticket_code'];
         $ticket = ETicket::with('order.payment', 'order.ticketZone', 'concert', 'user', 'wristband')->where('ticket_code', $code)->first();
         $message = 'E-Ticket tidak ditemukan.';
@@ -42,7 +44,7 @@ class OfficerController extends Controller
 
         if ($ticket && $ticket->order->payment?->payment_status !== 'success') {
             $message = 'Pembayaran belum berhasil.';
-        } elseif ($ticket && $ticket->concert->date->toDateString() !== now()->toDateString()) {
+        } elseif ($ticket && $ticket->concert->date->toDateString() !== $today) {
             $message = 'Konser tidak sesuai hari ini.';
         } elseif ($ticket && $ticket->wristband) {
             if ($ticket->ticket_status === 'belum_ditukar') {
@@ -81,6 +83,7 @@ class OfficerController extends Controller
 
     public function gateDashboard()
     {
+        $today = today(config('app.timezone'))->toDateString();
         $entered = Wristband::where('wristband_status', 'sudah_masuk')->count();
         $active = Wristband::where('wristband_status', 'aktif')->count();
         $histories = ScanHistory::with('officer', 'wristband.eTicket.user')
@@ -88,8 +91,8 @@ class OfficerController extends Controller
             ->latest('scanned_at')
             ->limit(8)
             ->get();
-        $todayScans = ScanHistory::where('scan_type', 'scan_gelang')->whereDate('scanned_at', today())->count();
-        $failedToday = ScanHistory::where('scan_type', 'scan_gelang')->where('scan_result', 'gagal')->whereDate('scanned_at', today())->count();
+        $todayScans = ScanHistory::where('scan_type', 'scan_gelang')->whereDate('scanned_at', $today)->count();
+        $failedToday = ScanHistory::where('scan_type', 'scan_gelang')->where('scan_result', 'gagal')->whereDate('scanned_at', $today)->count();
 
         return view('gate.dashboard', compact('entered', 'active', 'histories', 'todayScans', 'failedToday'));
     }
@@ -101,6 +104,7 @@ class OfficerController extends Controller
 
     public function validateWristband(Request $request, ?string $wristband_code = null)
     {
+        $today = today(config('app.timezone'))->toDateString();
         $code = $wristband_code ?: $request->validate(['wristband_code' => ['required', 'string']])['wristband_code'];
         $wristband = Wristband::with('eTicket.user', 'concert')->where('wristband_code', $code)->first();
         $message = 'Gelang tidak ditemukan.';
@@ -108,7 +112,7 @@ class OfficerController extends Controller
 
         if ($wristband && $wristband->wristband_status !== 'aktif') {
             $message = 'Gelang sudah digunakan atau invalid.';
-        } elseif ($wristband && $wristband->concert->date->toDateString() !== now()->toDateString()) {
+        } elseif ($wristband && $wristband->concert->date->toDateString() !== $today) {
             $message = 'Konser tidak sesuai hari ini.';
         } elseif ($wristband) {
             $wristband->update(['wristband_status' => 'sudah_masuk', 'entered_at' => now()]);
