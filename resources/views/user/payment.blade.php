@@ -63,10 +63,16 @@
                                 Buka Halaman Pembayaran
                             </a>
                         @endif
-                        <form method="post" action="{{ route('user.payments.sync', $order) }}">
-                            @csrf
-                            <button class="rounded-full border border-neutral-300 px-6 py-3 font-bold">Cek Status</button>
-                        </form>
+                        @if($payment?->gateway_order_id)
+                            <form method="post" action="{{ route('user.payments.sync', $order) }}">
+                                @csrf
+                                <button class="rounded-full border border-neutral-300 px-6 py-3 font-bold">Cek Status</button>
+                            </form>
+                        @else
+                            <span class="inline-flex items-center rounded-full border border-neutral-200 px-6 py-3 text-sm font-bold text-neutral-500">
+                                Pilih pembayaran di Snap dulu
+                            </span>
+                        @endif
                     </div>
                     <p class="mt-3 text-sm text-neutral-500">Untuk sandbox, gunakan metode dan kartu test dari dashboard/dokumentasi Midtrans.</p>
                 @endif

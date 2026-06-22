@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class MidtransController extends Controller
 {
+    public function showNotificationEndpoint()
+    {
+        return response('Midtrans notification endpoint is active. Use POST from Midtrans.', 200);
+    }
+
     public function notification(Request $request, MidtransService $midtrans)
     {
         $payload = $request->all();
@@ -44,7 +49,10 @@ class MidtransController extends Controller
     public function sync(Order $order, MidtransService $midtrans)
     {
         abort_if($order->user_id !== Auth::id(), 403);
-        abort_unless($order->payment?->gateway_order_id, 404, 'Transaksi Midtrans belum dibuat.');
+
+        if (! $order->payment?->gateway_order_id) {
+            return back()->with('error', 'Transaksi Midtrans belum dibuat. Klik Bayar dengan Midtrans dulu, lalu pilih metode pembayaran.');
+        }
 
         try {
             $payment = $midtrans->syncFromMidtrans($order->payment);

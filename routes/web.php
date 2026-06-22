@@ -23,6 +23,7 @@ Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.update');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/midtrans/notification', [MidtransController::class, 'showNotificationEndpoint']);
 Route::post('/midtrans/notification', [MidtransController::class, 'notification'])->name('midtrans.notification');
 Route::get('/midtrans/finish/{order:order_code}', [MidtransController::class, 'finish'])->name('midtrans.finish');
 

@@ -226,6 +226,30 @@ class FestifyWorkflowTest extends TestCase
         $this->assertDatabaseHas('e_tickets', ['order_id' => $order->id, 'ticket_status' => 'belum_ditukar']);
     }
 
+    public function test_midtrans_notification_endpoint_can_be_checked_in_browser(): void
+    {
+        $this->get('/midtrans/notification')
+            ->assertOk()
+            ->assertSee('Midtrans notification endpoint is active');
+    }
+
+    public function test_midtrans_sync_without_transaction_redirects_instead_of_404(): void
+    {
+        $user = User::factory()->create();
+        [$concert, $zone] = $this->concertWithZone();
+        $order = $this->orderFor($user, $concert, $zone);
+        Payment::create([
+            'order_id' => $order->id,
+            'payment_method' => 'midtrans',
+            'total_amount' => $order->total_price,
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('user.payments.sync', $order))
+            ->assertRedirect()
+            ->assertSessionHas('error');
+    }
+
     private function concertWithZone(int $stock = 20, int $zoneStock = 12, ?string $date = null): array
     {
         $concert = Concert::create([
