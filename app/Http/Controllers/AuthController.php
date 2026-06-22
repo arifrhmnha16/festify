@@ -24,7 +24,7 @@ class AuthController extends Controller
     {
         $localVerificationUrl = null;
 
-        if (app()->environment('local') && config('mail.default') === 'log' && $request->user()) {
+        if ($request->user() && (config('auth.verification_bypass') || (app()->environment('local') && config('mail.default') === 'log'))) {
             $localVerificationUrl = URL::temporarySignedRoute(
                 'verification.verify',
                 now()->addMinutes(60),

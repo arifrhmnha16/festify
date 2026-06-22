@@ -127,4 +127,6 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'verification_bypass' => (bool) env('EMAIL_VERIFICATION_BYPASS', false),
+
 ];

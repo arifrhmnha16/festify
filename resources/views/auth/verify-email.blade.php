@@ -7,9 +7,9 @@
         <p class="mt-4 text-neutral-600">Sebelum masuk dashboard user, verifikasi email akun melalui link yang sudah dikirim. Kalau belum menerima email, kirim ulang dari tombol di bawah.</p>
         @if($localVerificationUrl)
             <div class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                <p class="font-bold">Mode lokal aktif</p>
-                <p class="mt-1">Email tidak dikirim ke inbox karena <code>MAIL_MAILER=log</code>. Untuk testing lokal, klik tombol verifikasi di bawah.</p>
-                <a href="{{ $localVerificationUrl }}" class="mt-4 inline-flex rounded-full bg-amber-700 px-5 py-3 font-bold text-white">Verifikasi Mode Lokal</a>
+                <p class="font-bold">Mode verifikasi langsung aktif</p>
+                <p class="mt-1">Email belum dipakai untuk verifikasi. Klik tombol di bawah untuk melanjutkan.</p>
+                <a href="{{ $localVerificationUrl }}" class="mt-4 inline-flex rounded-full bg-amber-700 px-5 py-3 font-bold text-white">Verifikasi Sekarang</a>
             </div>
         @endif
         <form method="post" action="{{ route('verification.send') }}" class="mt-6">
