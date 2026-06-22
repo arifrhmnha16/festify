@@ -1,2 +1,14 @@
-[phases.setup]
-nixPkgs = ["php82", "php82Extensions.gd"]
+[variables]
+NIXPACKS_PHP_EXTENSIONS = "ctype curl dom fileinfo filter gd hash mbstring openssl pcre pdo session tokenizer xml xmlwriter pdo_mysql redis"
+
+[phases.build]
+cmds = [
+    "composer install --no-dev --optimize-autoloader --no-interaction",
+    "npm ci",
+    "npm run build",
+    "php artisan config:cache",
+    "php artisan view:cache"
+]
+
+[start]
+cmd = "php artisan migrate --force && (php artisan storage:link || true) && php artisan serve --host=0.0.0.0 --port=${PORT}"
