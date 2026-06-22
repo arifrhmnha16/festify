@@ -35,13 +35,7 @@
         </div>
         <div class="p-6 md:p-8">
             <div class="aspect-[4/1] overflow-hidden rounded-lg bg-neutral-950">
-                @if($ticket->concert->poster)
-                    <img src="{{ asset('storage/'.$ticket->concert->poster) }}" alt="{{ $ticket->concert->name }}" class="h-full w-full object-cover">
-                @else
-                    <div class="flex h-full items-end bg-[linear-gradient(135deg,#111,#3f2a20)] p-4 text-white">
-                        <p class="text-sm font-black">{{ $ticket->concert->artist }}</p>
-                    </div>
-                @endif
+                <x-concert-poster :concert="$ticket->concert" class="h-full w-full object-cover" />
             </div>
             <div class="mt-6 grid gap-6 md:grid-cols-[176px_1fr]">
                 <div class="grid place-items-center rounded-lg border p-4">

@@ -2,16 +2,7 @@
 @section('content')
 <section class="mx-auto grid max-w-7xl gap-8 px-4 py-12">
     <div class="aspect-[4/1] overflow-hidden rounded-lg bg-neutral-900">
-        @if($concert->poster)
-            <img src="{{ asset('storage/'.$concert->poster) }}" class="h-full w-full object-cover" alt="{{ $concert->name }}">
-        @else
-            <div class="flex h-full items-end bg-[linear-gradient(135deg,#111,#3f2a20)] p-6 text-white">
-                <div>
-                    <p class="text-sm uppercase tracking-widest text-orange-200">{{ $concert->artist }}</p>
-                    <h2 class="mt-2 text-4xl font-black">{{ $concert->name }}</h2>
-                </div>
-            </div>
-        @endif
+        <x-concert-poster :concert="$concert" class="h-full w-full object-cover" fallback-class="flex h-full items-end bg-[linear-gradient(135deg,#101322,#2c1f4f_48%,#da2b0d)] p-6 text-white" />
     </div>
     <div>
         <p class="text-sm font-bold uppercase text-orange-700">{{ $concert->artist }}</p>

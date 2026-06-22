@@ -1,15 +1,6 @@
 <a href="{{ auth()->check() ? route('user.concerts.show', $concert) : route('concerts.show', $concert) }}" class="group block">
     <div class="relative aspect-[3/1] overflow-hidden rounded-lg bg-neutral-900 shadow-sm">
-        @if($concert->poster)
-            <img src="{{ asset('storage/'.$concert->poster) }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" alt="{{ $concert->name }}">
-        @else
-            <div class="flex h-full items-end bg-[linear-gradient(135deg,#111,#3f2a20)] p-4 text-white">
-                <div>
-                    <p class="text-xs uppercase tracking-widest text-orange-200">{{ $concert->artist }}</p>
-                    <h3 class="text-lg font-black">{{ $concert->name }}</h3>
-                </div>
-            </div>
-        @endif
+        <x-concert-poster :concert="$concert" class="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
         @if($concert->is_promo)
             <span class="absolute left-3 top-3 rounded-md bg-red-600 px-3 py-1 text-xs font-black text-white shadow-sm">Promo</span>
         @endif

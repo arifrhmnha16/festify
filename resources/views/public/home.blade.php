@@ -8,17 +8,13 @@
 @endphp
 
 <section class="bg-white">
-    <div class="px-0 py-1 md:px-1">
-        <div class="relative overflow-hidden border-y border-neutral-200 bg-neutral-950 shadow-sm" data-promo-slider>
+    <div class="px-4 py-4 md:px-6">
+        <div class="relative overflow-hidden rounded-lg border border-neutral-200 bg-neutral-950 shadow-sm" data-promo-slider>
             <div class="flex transition-transform duration-500 ease-out" data-promo-track>
                 @forelse($bannerConcerts as $concert)
                     <article class="relative min-w-full">
                         <div class="relative aspect-[3/1] overflow-hidden bg-neutral-950 md:aspect-[4/1]">
-                            @if($concert->poster)
-                                <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="h-full w-full object-cover">
-                            @else
-                                <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover opacity-80">
-                            @endif
+                            <x-concert-poster :concert="$concert" class="h-full w-full object-cover" fallback-class="flex h-full items-end bg-[linear-gradient(135deg,#101322,#2c1f4f_48%,#da2b0d)] p-5 text-white md:p-8" />
                             @if($concert->is_promo)
                                 <span class="absolute left-4 top-4 z-20 rounded-md bg-red-600 px-3 py-1 text-xs font-black text-white shadow-sm md:left-6 md:top-6">Promo</span>
                             @endif
@@ -69,9 +65,9 @@
             </div>
             <a class="hidden rounded-full border border-neutral-200 px-5 py-2 text-sm font-bold text-neutral-700 hover:border-orange-700 hover:text-orange-700 md:inline-flex" href="{{ route('concerts.index') }}">Lihat semua</a>
         </div>
-        <div class="-mx-4 flex snap-x gap-5 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3">
+        <div class="flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10 md:overflow-visible md:pb-0 lg:grid-cols-3">
             @foreach($concerts as $concert)
-                <div class="w-[82vw] shrink-0 snap-start md:w-auto">
+                <div class="w-[min(20rem,calc(100vw-2rem))] shrink-0 snap-start md:w-auto">
                     <x-concert-card :concert="$concert" />
                 </div>
             @endforeach
@@ -90,9 +86,9 @@
             </div>
             <a class="hidden rounded-full border border-neutral-200 px-5 py-2 text-sm font-bold text-neutral-700 hover:border-orange-700 hover:text-orange-700 md:inline-flex" href="{{ route('concerts.index') }}">Lihat semua konser</a>
         </div>
-        <div class="-mx-4 flex snap-x gap-5 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3">
+        <div class="flex snap-x gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10 md:overflow-visible md:pb-0 lg:grid-cols-3">
             @forelse($upcomingConcerts as $concert)
-                <div class="w-[82vw] shrink-0 snap-start md:w-auto">
+                <div class="w-[min(20rem,calc(100vw-2rem))] shrink-0 snap-start md:w-auto">
                     <x-concert-card :concert="$concert" />
                 </div>
             @empty

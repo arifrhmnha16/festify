@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
 
 class Concert extends Model
@@ -11,6 +12,15 @@ class Concert extends Model
     protected function casts(): array
     {
         return ['date' => 'date', 'price' => 'integer', 'stock' => 'integer', 'is_featured' => 'boolean', 'is_promo' => 'boolean'];
+    }
+
+    public function getPosterUrlAttribute(): ?string
+    {
+        if (! $this->poster || ! Storage::disk('public')->exists($this->poster)) {
+            return null;
+        }
+
+        return asset('storage/'.$this->poster);
     }
 
     public function orders()
