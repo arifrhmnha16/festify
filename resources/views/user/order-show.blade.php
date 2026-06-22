@@ -46,9 +46,9 @@
             @if($paymentStatus === 'success')
                 <p class="mt-2 text-sm text-neutral-600">Pembayaran sudah diverifikasi. E-Ticket sudah tersedia.</p>
             @elseif($paymentStatus === 'failed')
-                <p class="mt-2 text-sm text-red-700">Pembayaran ditolak. Kirim ulang bukti pembayaran yang benar.</p>
+                <p class="mt-2 text-sm text-red-700">Pembayaran gagal atau kedaluwarsa. Buka pembayaran untuk membuat transaksi Midtrans baru.</p>
             @else
-                <p class="mt-2 text-sm text-neutral-600">E-Ticket akan terbit setelah admin memverifikasi pembayaran.</p>
+                <p class="mt-2 text-sm text-neutral-600">E-Ticket akan terbit otomatis setelah transaksi Midtrans berhasil.</p>
             @endif
         </aside>
     </div>

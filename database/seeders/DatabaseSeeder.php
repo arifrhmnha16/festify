@@ -9,7 +9,6 @@ use App\Models\Officer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\ScanHistory;
-use App\Models\TicketZone;
 use App\Models\User;
 use App\Models\Wristband;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -33,6 +32,8 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Gate Satu', 'username' => 'gate1', 'password' => bcrypt('password'), 'role' => 'gate', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Gate Dua', 'username' => 'gate2', 'password' => bcrypt('password'), 'role' => 'gate', 'created_at' => now(), 'updated_at' => now()],
         ]);
+        $loket = Officer::where('username', 'loket1')->first();
+        $gate = Officer::where('username', 'gate1')->first();
 
         $users = collect([
             ['name' => 'Nadia Putri', 'email' => 'nadia@example.com', 'phone' => '081200000001', 'password' => 'password'],
@@ -97,7 +98,7 @@ class DatabaseSeeder extends Seeder
 
             if ($index > 0) {
                 $wristbandCode = 'GLG-SEED-'.Str::upper(Str::random(6));
-                Wristband::create([
+                $wristband = Wristband::create([
                     'e_ticket_id' => $ticket->id,
                     'concert_id' => $concert->id,
                     'wristband_code' => $wristbandCode,
@@ -106,7 +107,55 @@ class DatabaseSeeder extends Seeder
                     'activated_at' => now()->subHours(2),
                     'entered_at' => $index === 2 ? now()->subHour() : null,
                 ]);
+
+                ScanHistory::create([
+                    'officer_id' => $loket->id,
+                    'e_ticket_id' => $ticket->id,
+                    'scan_type' => 'scan_eticket',
+                    'scan_result' => 'berhasil',
+                    'message' => 'Penukaran berhasil. Gelang aktif.',
+                    'scanned_at' => now()->subHours(2)->addMinutes($index),
+                ]);
+
+                if ($index === 2) {
+                    ScanHistory::create([
+                        'officer_id' => $gate->id,
+                        'wristband_id' => $wristband->id,
+                        'scan_type' => 'scan_gelang',
+                        'scan_result' => 'berhasil',
+                        'message' => 'Akses diterima. Silakan masuk.',
+                        'scanned_at' => now()->subHour(),
+                    ]);
+                }
             }
         }
+
+        $pendingConcert = $concerts[3];
+        $pendingZone = $pendingConcert->ticketZones()->orderBy('position')->first();
+        $pendingOrder = Order::create([
+            'user_id' => $users[3]->id,
+            'concert_id' => $pendingConcert->id,
+            'ticket_zone_id' => $pendingZone->id,
+            'order_code' => 'ORD-SEED-PENDING',
+            'order_date' => now()->subHours(5),
+            'ticket_quantity' => 2,
+            'total_price' => $pendingZone->price * 2,
+            'order_status' => 'pending',
+        ]);
+        Payment::create([
+            'order_id' => $pendingOrder->id,
+            'payment_method' => 'transfer_manual',
+            'total_amount' => $pendingOrder->total_price,
+            'payment_status' => 'pending',
+            'payment_date' => now()->subHours(4),
+        ]);
+
+        ScanHistory::create([
+            'officer_id' => $gate->id,
+            'scan_type' => 'scan_gelang',
+            'scan_result' => 'gagal',
+            'message' => 'Gelang tidak ditemukan.',
+            'scanned_at' => now()->subMinutes(45),
+        ]);
     }
 }

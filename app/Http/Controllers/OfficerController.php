@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\ETicket;
 use App\Models\ScanHistory;
 use App\Models\Wristband;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class OfficerController extends Controller
 {
@@ -22,11 +22,16 @@ class OfficerController extends Controller
             ->latest('scanned_at')
             ->limit(8)
             ->get();
+        $todayScans = ScanHistory::where('scan_type', 'scan_eticket')->whereDate('scanned_at', today())->count();
+        $failedToday = ScanHistory::where('scan_type', 'scan_eticket')->where('scan_result', 'gagal')->whereDate('scanned_at', today())->count();
 
-        return view('loket.dashboard', compact('exchanged', 'active', 'histories'));
+        return view('loket.dashboard', compact('exchanged', 'active', 'histories', 'todayScans', 'failedToday'));
     }
 
-    public function scanEticket() { return view('loket.scan'); }
+    public function scanEticket()
+    {
+        return view('loket.scan');
+    }
 
     public function exchange(Request $request, ?string $ticket_code = null)
     {
@@ -70,6 +75,7 @@ class OfficerController extends Controller
         }
 
         $this->history('scan_eticket', $success, $message, $ticket?->id, null);
+
         return view('loket.result', compact('ticket', 'message', 'success'));
     }
 
@@ -82,11 +88,16 @@ class OfficerController extends Controller
             ->latest('scanned_at')
             ->limit(8)
             ->get();
+        $todayScans = ScanHistory::where('scan_type', 'scan_gelang')->whereDate('scanned_at', today())->count();
+        $failedToday = ScanHistory::where('scan_type', 'scan_gelang')->where('scan_result', 'gagal')->whereDate('scanned_at', today())->count();
 
-        return view('gate.dashboard', compact('entered', 'active', 'histories'));
+        return view('gate.dashboard', compact('entered', 'active', 'histories', 'todayScans', 'failedToday'));
     }
 
-    public function scanWristband() { return view('gate.scan'); }
+    public function scanWristband()
+    {
+        return view('gate.scan');
+    }
 
     public function validateWristband(Request $request, ?string $wristband_code = null)
     {
@@ -106,6 +117,7 @@ class OfficerController extends Controller
         }
 
         $this->history('scan_gelang', $success, $message, null, $wristband?->id);
+
         return view('gate.result', compact('wristband', 'message', 'success'));
     }
 

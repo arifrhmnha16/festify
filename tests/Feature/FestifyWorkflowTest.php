@@ -159,6 +159,73 @@ class FestifyWorkflowTest extends TestCase
             ->assertHeader('content-type', 'text/csv; charset=UTF-8');
     }
 
+    public function test_admin_can_filter_scan_report_and_export_excel(): void
+    {
+        $admin = Admin::create(['name' => 'Admin Festify', 'username' => 'admin', 'password' => 'password']);
+        $loket = Officer::create(['name' => 'Loket Satu', 'username' => 'loket1', 'password' => 'password', 'role' => 'loket']);
+        $gate = Officer::create(['name' => 'Gate Satu', 'username' => 'gate1', 'password' => 'password', 'role' => 'gate']);
+        ScanHistory::create([
+            'officer_id' => $loket->id,
+            'scan_type' => 'scan_eticket',
+            'scan_result' => 'berhasil',
+            'message' => 'Penukaran berhasil. Gelang aktif.',
+            'scanned_at' => now(),
+        ]);
+        ScanHistory::create([
+            'officer_id' => $gate->id,
+            'scan_type' => 'scan_gelang',
+            'scan_result' => 'gagal',
+            'message' => 'Gelang tidak ditemukan.',
+            'scanned_at' => now(),
+        ]);
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.reports', ['scan_type' => 'scan_gelang', 'scan_result' => 'gagal']))
+            ->assertOk()
+            ->assertSee('Gelang tidak ditemukan.')
+            ->assertDontSee('Penukaran berhasil. Gelang aktif.');
+
+        $this->actingAs($admin, 'admin')
+            ->get(route('admin.reports.export', ['format' => 'xls', 'scan_type' => 'scan_gelang']))
+            ->assertOk()
+            ->assertHeader('content-type', 'application/vnd.ms-excel');
+    }
+
+    public function test_midtrans_notification_marks_payment_success_and_issues_e_ticket(): void
+    {
+        config(['services.midtrans.server_key' => 'SB-Mid-server-test']);
+        $user = User::factory()->create();
+        [$concert, $zone] = $this->concertWithZone();
+        $order = $this->orderFor($user, $concert, $zone);
+        Payment::create([
+            'order_id' => $order->id,
+            'gateway_order_id' => 'MIDTRANS-ORDER-001',
+            'payment_method' => 'midtrans',
+            'total_amount' => $order->total_price,
+        ]);
+        $payload = [
+            'order_id' => 'MIDTRANS-ORDER-001',
+            'status_code' => '200',
+            'gross_amount' => number_format($order->total_price, 2, '.', ''),
+            'transaction_status' => 'settlement',
+            'transaction_id' => 'trx-midtrans-001',
+            'payment_type' => 'bank_transfer',
+        ];
+        $payload['signature_key'] = hash('sha512', $payload['order_id'].$payload['status_code'].$payload['gross_amount'].config('services.midtrans.server_key'));
+
+        $this->postJson(route('midtrans.notification'), $payload)
+            ->assertOk()
+            ->assertJsonPath('payment_status', 'success');
+
+        $this->assertDatabaseHas('payments', [
+            'gateway_order_id' => 'MIDTRANS-ORDER-001',
+            'payment_status' => 'success',
+            'midtrans_transaction_id' => 'trx-midtrans-001',
+        ]);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'order_status' => 'paid']);
+        $this->assertDatabaseHas('e_tickets', ['order_id' => $order->id, 'ticket_status' => 'belum_ditukar']);
+    }
+
     private function concertWithZone(int $stock = 20, int $zoneStock = 12, ?string $date = null): array
     {
         $concert = Concert::create([

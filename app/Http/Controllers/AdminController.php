@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
 use App\Models\Concert;
 use App\Models\ETicket;
 use App\Models\Officer;
@@ -12,11 +11,12 @@ use App\Models\ScanHistory;
 use App\Models\TicketZone;
 use App\Models\User;
 use App\Models\Wristband;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -31,13 +31,24 @@ class AdminController extends Controller
             'Gelang aktif' => Wristband::where('wristband_status', 'aktif')->count(),
             'Masuk gate' => Wristband::where('wristband_status', 'sudah_masuk')->count(),
         ];
+        $paidRevenue = Payment::where('payment_status', 'success')->sum('total_amount');
+        $scanTotal = ScanHistory::count();
+        $scanSuccess = ScanHistory::where('scan_result', 'berhasil')->count();
+        $insights = [
+            'Pendapatan terverifikasi' => 'Rp'.number_format($paidRevenue, 0, ',', '.'),
+            'Pembayaran pending' => Payment::where('payment_status', 'pending')->count(),
+            'Order belum selesai' => Order::whereIn('order_status', ['pending', 'expired'])->count(),
+            'Rasio scan berhasil' => $scanTotal > 0 ? round(($scanSuccess / $scanTotal) * 100).'%' : '0%',
+        ];
         $orders = Order::with('user', 'concert', 'ticketZone', 'payment')->latest()->limit(6)->get();
-        return view('admin.dashboard', compact('stats', 'orders'));
+
+        return view('admin.dashboard', compact('stats', 'orders', 'insights'));
     }
 
     public function concerts()
     {
         $concerts = Concert::latest()->paginate(10);
+
         return view('admin.concerts', compact('concerts'));
     }
 
@@ -57,6 +68,7 @@ class AdminController extends Controller
     public function editConcert(Concert $concert)
     {
         $concert->load('ticketZones');
+
         return view('admin.concert-edit', compact('concert'));
     }
 
@@ -75,6 +87,7 @@ class AdminController extends Controller
         }
 
         $concert->delete();
+
         return back()->with('success', 'Konser dihapus.');
     }
 
@@ -117,12 +130,14 @@ class AdminController extends Controller
         }
 
         $user->update($data);
+
         return back()->with('success', 'User diperbarui.');
     }
 
     public function destroyUser(User $user)
     {
         $user->delete();
+
         return back()->with('success', 'User dihapus.');
     }
 
@@ -139,6 +154,7 @@ class AdminController extends Controller
             'password' => ['required', 'min:6'],
             'role' => ['required', 'in:loket,gate'],
         ]));
+
         return back()->with('success', 'Petugas ditambahkan.');
     }
 
@@ -156,12 +172,14 @@ class AdminController extends Controller
         }
 
         $officer->update($data);
+
         return back()->with('success', 'Petugas diperbarui.');
     }
 
     public function destroyOfficer(Officer $officer)
     {
         $officer->delete();
+
         return back()->with('success', 'Petugas dihapus.');
     }
 
@@ -216,6 +234,7 @@ class AdminController extends Controller
     public function destroyOrder(Order $order)
     {
         $order->delete();
+
         return back()->with('success', 'Pemesanan dihapus.');
     }
 
@@ -266,6 +285,7 @@ class AdminController extends Controller
     public function destroyPayment(Payment $payment)
     {
         $payment->delete();
+
         return back()->with('success', 'Pembayaran dihapus.');
     }
 
@@ -310,6 +330,7 @@ class AdminController extends Controller
     public function destroyETicket(ETicket $ticket)
     {
         $ticket->delete();
+
         return back()->with('success', 'E-Ticket dihapus.');
     }
 
@@ -353,39 +374,86 @@ class AdminController extends Controller
     public function destroyWristband(Wristband $wristband)
     {
         $wristband->delete();
+
         return back()->with('success', 'Gelang dihapus.');
     }
 
-    public function reports()
+    public function reports(Request $request)
     {
-        $histories = ScanHistory::with('officer', 'eTicket.user', 'wristband')->latest('scanned_at')->paginate(20);
-        return view('admin.reports', compact('histories'));
+        $histories = $this->scanHistoryQuery($request)
+            ->latest('scanned_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $summary = [
+            'total' => $this->scanHistoryQuery($request)->count(),
+            'berhasil' => $this->scanHistoryQuery($request)->where('scan_result', 'berhasil')->count(),
+            'gagal' => $this->scanHistoryQuery($request)->where('scan_result', 'gagal')->count(),
+        ];
+
+        return view('admin.reports', [
+            'histories' => $histories,
+            'summary' => $summary,
+            'officers' => Officer::orderBy('name')->get(),
+            'filters' => $request->only(['from', 'to', 'scan_type', 'scan_result', 'officer_id']),
+        ]);
     }
 
-    public function exportReports()
+    public function exportReports(Request $request)
     {
-        $fileName = 'festify-scan-report-'.now()->format('Ymd-His').'.csv';
+        $format = $request->query('format', 'csv');
+        $histories = $this->scanHistoryQuery($request)->latest('scanned_at')->get();
+        $fileStamp = now()->format('Ymd-His');
 
-        return response()->streamDownload(function () {
+        if ($format === 'pdf') {
+            $pdf = Pdf::loadView('pdf.scan-report', [
+                'histories' => $histories,
+                'filters' => $request->only(['from', 'to', 'scan_type', 'scan_result', 'officer_id']),
+            ])->setPaper('a4', 'landscape');
+
+            return $pdf->download("festify-scan-report-{$fileStamp}.pdf");
+        }
+
+        if ($format === 'xls') {
+            $fileName = "festify-scan-report-{$fileStamp}.xls";
+
+            return response()->streamDownload(function () use ($histories) {
+                echo '<table border="1">';
+                echo '<tr><th>Waktu</th><th>Petugas</th><th>Tipe</th><th>Hasil</th><th>Kode E-Ticket</th><th>Kode Gelang</th><th>User</th><th>Pesan</th></tr>';
+                foreach ($histories as $history) {
+                    echo '<tr>';
+                    echo '<td>'.e($history->scanned_at?->format('Y-m-d H:i:s')).'</td>';
+                    echo '<td>'.e($history->officer?->name).'</td>';
+                    echo '<td>'.e($history->scan_type).'</td>';
+                    echo '<td>'.e($history->scan_result).'</td>';
+                    echo '<td>'.e($history->eTicket?->ticket_code).'</td>';
+                    echo '<td>'.e($history->wristband?->wristband_code).'</td>';
+                    echo '<td>'.e($history->eTicket?->user?->name ?? $history->wristband?->eTicket?->user?->name).'</td>';
+                    echo '<td>'.e($history->message).'</td>';
+                    echo '</tr>';
+                }
+                echo '</table>';
+            }, $fileName, ['Content-Type' => 'application/vnd.ms-excel']);
+        }
+
+        $fileName = "festify-scan-report-{$fileStamp}.csv";
+
+        return response()->streamDownload(function () use ($histories) {
             $output = fopen('php://output', 'w');
             fputcsv($output, ['Waktu', 'Petugas', 'Tipe', 'Hasil', 'Kode E-Ticket', 'Kode Gelang', 'User', 'Pesan']);
 
-            ScanHistory::with('officer', 'eTicket.user', 'wristband')
-                ->latest('scanned_at')
-                ->chunk(100, function ($histories) use ($output) {
-                    foreach ($histories as $history) {
-                        fputcsv($output, [
-                            $history->scanned_at?->format('Y-m-d H:i:s'),
-                            $history->officer?->name,
-                            $history->scan_type,
-                            $history->scan_result,
-                            $history->eTicket?->ticket_code,
-                            $history->wristband?->wristband_code,
-                            $history->eTicket?->user?->name,
-                            $history->message,
-                        ]);
-                    }
-                });
+            foreach ($histories as $history) {
+                fputcsv($output, [
+                    $history->scanned_at?->format('Y-m-d H:i:s'),
+                    $history->officer?->name,
+                    $history->scan_type,
+                    $history->scan_result,
+                    $history->eTicket?->ticket_code,
+                    $history->wristband?->wristband_code,
+                    $history->eTicket?->user?->name ?? $history->wristband?->eTicket?->user?->name,
+                    $history->message,
+                ]);
+            }
 
             fclose($output);
         }, $fileName, ['Content-Type' => 'text/csv']);
@@ -394,6 +462,7 @@ class AdminController extends Controller
     public function destroyScanHistory(ScanHistory $history)
     {
         $history->delete();
+
         return back()->with('success', 'Riwayat scan dihapus.');
     }
 
@@ -401,15 +470,27 @@ class AdminController extends Controller
     {
         if ($payment->payment_status === 'success') {
             $this->issueTickets($payment->order);
+
             return;
         }
 
         if ($payment->payment_status === 'failed') {
             $payment->order->update(['order_status' => 'cancelled']);
+
             return;
         }
 
         $payment->order->update(['order_status' => 'pending']);
+    }
+
+    private function scanHistoryQuery(Request $request)
+    {
+        return ScanHistory::with('officer', 'eTicket.user', 'wristband.eTicket.user')
+            ->when($request->filled('from'), fn ($query) => $query->whereDate('scanned_at', '>=', $request->date('from')))
+            ->when($request->filled('to'), fn ($query) => $query->whereDate('scanned_at', '<=', $request->date('to')))
+            ->when($request->filled('scan_type'), fn ($query) => $query->where('scan_type', $request->input('scan_type')))
+            ->when($request->filled('scan_result'), fn ($query) => $query->where('scan_result', $request->input('scan_result')))
+            ->when($request->filled('officer_id'), fn ($query) => $query->where('officer_id', $request->integer('officer_id')));
     }
 
     private function issueTickets(Order $order): void

@@ -1,9 +1,15 @@
 @extends('layouts.app', ['title' => 'Dashboard Gate'])
 @section('content')
-<section class="mx-auto max-w-5xl px-4 py-12">
-    <h1 class="text-4xl font-black">Dashboard Gate</h1>
+<section class="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+    <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+            <p class="text-sm font-bold uppercase text-orange-700">Petugas gate</p>
+            <h1 class="mt-2 text-3xl font-black sm:text-4xl">Dashboard Gate</h1>
+        </div>
+        <a class="rounded-full bg-neutral-950 px-6 py-3 text-sm font-bold text-white" href="{{ route('gate.scan') }}">Scan QR Gelang</a>
+    </div>
 
-    <div class="mt-8 grid gap-4 md:grid-cols-2">
+    <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-lg border bg-white p-6">
             <p>Sudah masuk gate</p>
             <strong class="text-4xl">{{ $entered }}</strong>
@@ -12,9 +18,15 @@
             <p>Gelang aktif</p>
             <strong class="text-4xl">{{ $active }}</strong>
         </div>
+        <div class="rounded-lg border bg-white p-6">
+            <p>Scan hari ini</p>
+            <strong class="text-4xl">{{ $todayScans }}</strong>
+        </div>
+        <div class="rounded-lg border border-red-200 bg-red-50 p-6 text-red-800">
+            <p>Gagal hari ini</p>
+            <strong class="text-4xl">{{ $failedToday }}</strong>
+        </div>
     </div>
-
-    <a class="mt-8 inline-flex rounded-full bg-neutral-950 px-6 py-3 font-bold text-white" href="{{ route('gate.scan') }}">Scan QR Gelang</a>
 
     <div class="mt-8 overflow-hidden rounded-lg border bg-white">
         <div class="border-b px-5 py-4">
@@ -37,7 +49,7 @@
                             <td class="p-3">{{ $history->scanned_at->format('d M Y H:i') }}</td>
                             <td class="p-3 font-bold">{{ $history->officer->name }}</td>
                             <td class="p-3">{{ $history->wristband?->eTicket?->user?->name ?? '-' }}</td>
-                            <td class="p-3">{{ $history->scan_result }}</td>
+                            <td class="p-3"><span class="{{ $history->scan_result === 'berhasil' ? 'fi-badge-success' : 'fi-badge-danger' }}">{{ $history->scan_result }}</span></td>
                             <td class="p-3">{{ $history->message }}</td>
                         </tr>
                     @empty

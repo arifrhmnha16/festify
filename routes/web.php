@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\OfficerController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\UserAreaController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'home'])->name('home');
@@ -21,6 +23,9 @@ Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('guest')->name('password.update');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::post('/midtrans/notification', [MidtransController::class, 'notification'])->name('midtrans.notification');
+Route::get('/midtrans/finish/{order:order_code}', [MidtransController::class, 'finish'])->name('midtrans.finish');
+
 Route::get('/email/verify', [AuthController::class, 'showVerificationNotice'])
     ->middleware('auth')
     ->name('verification.notice');
@@ -34,9 +39,9 @@ Route::post('/email/verification-notification', [AuthController::class, 'resendV
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.store');
 Route::get('/loket/login', fn () => app(AuthController::class)->showOfficerLogin('loket'))->name('loket.login');
-Route::post('/loket/login', fn (Illuminate\Http\Request $request) => app(AuthController::class)->officerLogin($request, 'loket'))->name('loket.login.store');
+Route::post('/loket/login', fn (Request $request) => app(AuthController::class)->officerLogin($request, 'loket'))->name('loket.login.store');
 Route::get('/gate/login', fn () => app(AuthController::class)->showOfficerLogin('gate'))->name('gate.login');
-Route::post('/gate/login', fn (Illuminate\Http\Request $request) => app(AuthController::class)->officerLogin($request, 'gate'))->name('gate.login.store');
+Route::post('/gate/login', fn (Request $request) => app(AuthController::class)->officerLogin($request, 'gate'))->name('gate.login.store');
 
 Route::middleware(['role:user', 'verified'])->prefix('user')->name('user.')->group(function () {
     Route::get('/dashboard', [UserAreaController::class, 'dashboard'])->name('dashboard');
@@ -48,6 +53,7 @@ Route::middleware(['role:user', 'verified'])->prefix('user')->name('user.')->gro
     Route::get('/orders/{order}', [UserAreaController::class, 'order'])->name('orders.show');
     Route::get('/payments/{order}', [UserAreaController::class, 'payment'])->name('payments.show');
     Route::post('/payments/{order}', [UserAreaController::class, 'submitPayment'])->name('payments.submit');
+    Route::post('/payments/{order}/sync', [MidtransController::class, 'sync'])->name('payments.sync');
     Route::get('/e-tickets', [UserAreaController::class, 'tickets'])->name('tickets');
     Route::get('/e-tickets/{ticket}/download', [UserAreaController::class, 'downloadTicket'])->name('tickets.download');
     Route::get('/e-tickets/{ticket}', [UserAreaController::class, 'ticket'])->name('tickets.show');

@@ -47,15 +47,29 @@
             </div>
         </div>
 
-        <div class="fi-card p-5">
-            <h2 class="text-lg font-black">Akses Cepat</h2>
-            <div class="mt-4 grid gap-2">
-                @foreach(['concerts'=>'Konser','users'=>'User','officers'=>'Petugas','orders'=>'Pemesanan','payments'=>'Pembayaran','tickets'=>'E-Ticket','wristbands'=>'Gelang','reports'=>'Laporan'] as $route=>$label)
-                    <a class="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 text-sm font-bold transition hover:border-orange-300 hover:bg-orange-50" href="{{ route('admin.'.$route) }}">
-                        <span>{{ $label }}</span>
-                        <span class="text-neutral-400">Open</span>
-                    </a>
-                @endforeach
+        <div class="grid gap-6">
+            <div class="fi-card p-5">
+                <h2 class="text-lg font-black">Insight Operasional</h2>
+                <div class="mt-4 grid gap-3">
+                    @foreach($insights as $label => $value)
+                        <div class="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+                            <p class="text-xs font-bold uppercase text-neutral-500">{{ $label }}</p>
+                            <p class="mt-1 text-xl font-black">{{ $value }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="fi-card p-5">
+                <h2 class="text-lg font-black">Akses Cepat</h2>
+                <div class="mt-4 grid gap-2">
+                    @foreach(['concerts'=>'Konser','users'=>'User','officers'=>'Petugas','orders'=>'Pemesanan','payments'=>'Pembayaran','tickets'=>'E-Ticket','wristbands'=>'Gelang','reports'=>'Laporan'] as $route=>$label)
+                        <a class="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3 text-sm font-bold transition hover:border-orange-300 hover:bg-orange-50" href="{{ route('admin.'.$route) }}">
+                            <span>{{ $label }}</span>
+                            <span class="text-neutral-400">Open</span>
+                        </a>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
