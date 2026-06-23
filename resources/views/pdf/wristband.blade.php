@@ -1,7 +1,12 @@
 @php
     $ticket = $wristband->eTicket;
     $logo = \App\Support\PdfImage::containDataUri(public_path('logofest.png'), 184, 52, 62);
-    $posterPath = $wristband->concert->poster ? public_path('storage/'.$wristband->concert->poster) : null;
+    $posterPath = null;
+    if ($wristband->concert->poster) {
+        $publicPoster = public_path('posters/'.basename($wristband->concert->poster));
+        $storagePoster = public_path('storage/'.$wristband->concert->poster);
+        $posterPath = is_file($publicPoster) ? $publicPoster : $storagePoster;
+    }
     $poster = \App\Support\PdfImage::dataUri($posterPath, 210, 118, 42);
     $qr = \App\Support\PdfQr::dataUri($wristband->wristband_code, 4, 2);
 @endphp
@@ -11,35 +16,37 @@
     <meta charset="utf-8">
     <style>
         @page { margin: 0; size: 254mm 51mm; }
-        body { margin: 0; font-family: Helvetica, Arial, sans-serif; color: #111; }
-        .band { width: 720px; height: 144px; border: 1.3px solid #111; border-radius: 5px; overflow: hidden; }
+        * { box-sizing: border-box; }
+        html, body { width: 254mm; height: 51mm; margin: 0; padding: 0; }
+        body { font-family: Helvetica, Arial, sans-serif; color: #111; }
+        .band { width: 254mm; height: 51mm; border: 1.2pt solid #111; border-radius: 2mm; overflow: hidden; }
         table { border-collapse: collapse; width: 100%; height: 100%; table-layout: fixed; }
         td { vertical-align: middle; }
-        .side { width: 40px; background: #050505; color: #fff; text-align: center; }
+        .side { width: 14mm; background: #050505; color: #fff; text-align: center; }
         .side-orange { background: #d92d00; }
-        .rotate { transform: rotate(-90deg); white-space: nowrap; font-size: 7px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
-        .poster-cell { width: 124px; background: #171717; border-right: 1px dashed #ccc; padding: 8px; }
-        .poster-box { height: 126px; background: #050505; border-radius: 5px; text-align: center; overflow: hidden; }
+        .rotate { transform: rotate(-90deg); white-space: nowrap; font-size: 7pt; font-weight: 900; letter-spacing: 2.7pt; text-transform: uppercase; }
+        .poster-cell { width: 44mm; background: #171717; border-right: 0.8pt dashed #ccc; padding: 2.5mm; }
+        .poster-box { height: 45mm; background: #050505; border-radius: 1.8mm; text-align: center; overflow: hidden; }
         .poster-box img { width: 100%; height: 100%; object-fit: contain; }
-        .info { width: 204px; border-right: 1px dashed #ccc; padding: 9px 12px; }
-        .logo { width: 92px; height: 26px; object-fit: contain; }
-        .label { margin-top: 6px; color: #c2410c; font-size: 7px; font-weight: 900; letter-spacing: 1.7px; text-transform: uppercase; }
-        h1 { margin: 4px 0 0; font-size: 14px; line-height: 1.06; font-weight: 900; }
-        .meta { margin-top: 4px; color: #555; font-size: 8px; white-space: nowrap; overflow: hidden; }
-        .mini { margin-top: 6px; }
-        .mini div { display: inline-block; width: 64px; border: 1px solid #ddd; border-radius: 4px; padding: 4px; font-size: 7px; }
-        .mini strong { display: block; margin-top: 1px; font-size: 7.5px; white-space: nowrap; overflow: hidden; }
-        .qr-cell { width: 110px; border-right: 1px dashed #ccc; background: #fafaf9; text-align: center; }
-        .qr-box { display: inline-block; background: white; padding: 6px; border-radius: 5px; }
-        .qr-box img { width: 78px; height: 78px; }
-        .qr-code { margin-top: 4px; font-size: 7px; font-family: Courier, monospace; font-weight: 900; }
-        .holder { padding: 10px 12px; }
-        .holder-label { color: #c2410c; font-size: 7px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; }
-        .holder h2 { margin: 7px 0 0; font-size: 15px; font-weight: 900; white-space: nowrap; overflow: hidden; }
-        .ticket-code { margin-top: 7px; font-size: 8px; color: #555; font-family: Courier, monospace; }
-        .gate { margin-top: 12px; background: #050505; color: white; border-radius: 6px; padding: 8px; }
-        .gate small { color: #fed7aa; text-transform: uppercase; letter-spacing: 1.7px; font-size: 7px; }
-        .gate p { margin: 3px 0 0; font-size: 8px; font-weight: 800; line-height: 1.25; }
+        .info { width: 72mm; border-right: 0.8pt dashed #ccc; padding: 3mm 4mm; }
+        .logo { width: 33mm; height: 9mm; object-fit: contain; }
+        .label { margin-top: 2mm; color: #c2410c; font-size: 7pt; font-weight: 900; letter-spacing: 1.5pt; text-transform: uppercase; }
+        h1 { margin: 1.5mm 0 0; font-size: 14pt; line-height: 1.06; font-weight: 900; }
+        .meta { margin-top: 1.2mm; color: #555; font-size: 7.5pt; white-space: nowrap; overflow: hidden; }
+        .mini { margin-top: 2mm; }
+        .mini div { display: inline-block; width: 23mm; border: 0.7pt solid #ddd; border-radius: 1.5mm; padding: 1.5mm; font-size: 6.5pt; }
+        .mini strong { display: block; margin-top: 0.5mm; font-size: 7pt; white-space: nowrap; overflow: hidden; }
+        .qr-cell { width: 39mm; border-right: 0.8pt dashed #ccc; background: #fafaf9; text-align: center; }
+        .qr-box { display: inline-block; background: white; padding: 2mm; border-radius: 1.5mm; }
+        .qr-box img { width: 27mm; height: 27mm; }
+        .qr-code { margin-top: 1.5mm; font-size: 6.5pt; font-family: Courier, monospace; font-weight: 900; }
+        .holder { width: 71mm; padding: 3.2mm 4mm; }
+        .holder-label { color: #c2410c; font-size: 7pt; font-weight: 900; letter-spacing: 2.2pt; text-transform: uppercase; }
+        .holder h2 { margin: 2.5mm 0 0; font-size: 14pt; font-weight: 900; white-space: nowrap; overflow: hidden; }
+        .ticket-code { margin-top: 2mm; font-size: 7.5pt; color: #555; font-family: Courier, monospace; }
+        .gate { margin-top: 3.5mm; background: #050505; color: white; border-radius: 2mm; padding: 2.6mm; }
+        .gate small { color: #fed7aa; text-transform: uppercase; letter-spacing: 1.5pt; font-size: 6.5pt; }
+        .gate p { margin: 1mm 0 0; font-size: 7.5pt; font-weight: 800; line-height: 1.25; }
     </style>
 </head>
 <body>

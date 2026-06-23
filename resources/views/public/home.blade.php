@@ -8,8 +8,8 @@
 @endphp
 
 <section class="bg-white">
-    <div class="px-4 py-4 md:px-6">
-        <div class="relative overflow-hidden rounded-lg border border-neutral-200 bg-neutral-950 shadow-sm" data-promo-slider>
+    <div class="px-0 py-0">
+        <div class="relative overflow-hidden border-y border-neutral-200 bg-neutral-950" data-promo-slider>
             <div class="flex transition-transform duration-500 ease-out" data-promo-track>
                 @forelse($bannerConcerts as $concert)
                     <article class="relative min-w-full">
