@@ -129,7 +129,7 @@ class OfficerController extends Controller
     {
         $wristband->load('concert', 'eTicket.user', 'eTicket.order.ticketZone');
 
-        $pdf = Pdf::loadView('pdf.wristband', compact('wristband'))->setPaper([0, 0, 720, 144], 'landscape');
+        $pdf = Pdf::loadView('pdf.wristband', compact('wristband'))->setPaper([0, 0, 720, 144]);
         $filename = $wristband->wristband_code.'.pdf';
 
         if ($request->query('mode') === 'print') {
