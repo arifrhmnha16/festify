@@ -32,10 +32,10 @@
         .label { margin-top: 6pt; color: #c2410c; font-size: 6.4pt; font-weight: 900; letter-spacing: 2.2pt; text-transform: uppercase; }
         h1 { margin: 5pt 0 0; font-size: 13pt; line-height: 1.08; font-weight: 900; max-height: 31pt; overflow: hidden; }
         .meta { margin-top: 5pt; color: #555; font-size: 6.5pt; white-space: nowrap; overflow: hidden; }
-        .mini { position: absolute; left: 12pt; bottom: 7pt; white-space: nowrap; }
-        .mini div { display: inline-block; width: 80pt; height: 27pt; border: 0.7pt solid #ddd; border-radius: 4pt; padding: 4pt; font-size: 5.8pt; overflow: hidden; }
+        .mini { position: absolute; left: 12pt; top: 103pt; white-space: nowrap; }
+        .mini div { display: inline-block; width: 80pt; height: 24pt; border: 0.7pt solid #ddd; border-radius: 4pt; padding: 3pt 4pt; font-size: 5.8pt; overflow: hidden; }
         .mini strong { display: block; margin-top: 2pt; font-size: 6.5pt; white-space: nowrap; overflow: hidden; }
-        .qr-cell { left: 369pt; width: 111pt; border-right: 0.7pt dashed #ccc; background: #fafaf9; text-align: center; padding-top: 22pt; }
+        .qr-cell { left: 369pt; width: 111pt; border-right: 0.7pt dashed #ccc; background: #fafaf9; text-align: center; padding-top: 19pt; }
         .qr-box { display: inline-block; background: white; padding: 6pt; border-radius: 5pt; }
         .qr-box img { width: 72pt; height: 72pt; }
         .qr-code { margin-top: 6pt; font-size: 6.2pt; font-family: Courier, monospace; font-weight: 900; }
@@ -43,7 +43,7 @@
         .holder-label { color: #c2410c; font-size: 6.2pt; font-weight: 900; letter-spacing: 3pt; text-transform: uppercase; }
         .holder h2 { margin: 12pt 0 0; font-size: 13pt; font-weight: 900; white-space: nowrap; overflow: hidden; }
         .ticket-code { margin-top: 9pt; font-size: 6.5pt; color: #555; font-family: Courier, monospace; }
-        .gate { position: absolute; left: 12pt; bottom: 8pt; background: #050505; color: white; border-radius: 5pt; padding: 8pt; width: 162pt; height: 38pt; }
+        .gate { position: absolute; left: 12pt; top: 90pt; background: #050505; color: white; border-radius: 5pt; padding: 7pt 8pt; width: 162pt; height: 34pt; }
         .gate small { color: #fed7aa; text-transform: uppercase; letter-spacing: 1.6pt; font-size: 5.8pt; }
         .gate p { margin: 4pt 0 0; font-size: 6.8pt; font-weight: 800; line-height: 1.1; }
     </style>
