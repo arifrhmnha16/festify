@@ -25,7 +25,7 @@
         .side-orange { left: 677.5pt; background: #d92d00; }
         .vertical { padding-top: 34pt; font-size: 6.1pt; line-height: 6.8pt; font-weight: 900; letter-spacing: 1.4pt; text-transform: uppercase; }
         .poster-cell { left: 40.5pt; width: 126pt; background: #171717; border-right: 0.7pt dashed #ccc; }
-        .poster-box { position: absolute; left: 12pt; top: 10pt; width: 102pt; height: 116pt; background: #050505; border-radius: 5pt; text-align: center; overflow: hidden; }
+        .poster-box { position: absolute; left: 20pt; top: 22pt; width: 86pt; height: 92pt; background: #050505; border-radius: 5pt; text-align: center; overflow: hidden; }
         .poster-box img { width: 100%; height: 100%; object-fit: contain; }
         .info { left: 166.5pt; width: 202.5pt; border-right: 0.7pt dashed #ccc; padding: 18pt 12pt 8pt 12pt; }
         .logo { width: 83pt; height: 24pt; object-fit: contain; }
