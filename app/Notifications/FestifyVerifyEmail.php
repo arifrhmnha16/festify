@@ -29,7 +29,7 @@ class FestifyVerifyEmail extends VerifyEmail
             return call_user_func(static::$createUrlCallback, $notifiable);
         }
 
-        return URL::temporarySignedRoute(
+        $path = URL::temporarySignedRoute(
             'verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
@@ -38,5 +38,7 @@ class FestifyVerifyEmail extends VerifyEmail
             ],
             false,
         );
+
+        return rtrim(Config::get('app.url'), '/').'/'.ltrim($path, '/');
     }
 }

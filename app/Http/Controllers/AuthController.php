@@ -25,14 +25,16 @@ class AuthController extends Controller
         $localVerificationUrl = null;
 
         if ($request->user() && (config('auth.verification_bypass') || (app()->environment('local') && config('mail.default') === 'log'))) {
-            $localVerificationUrl = URL::temporarySignedRoute(
-                'verification.verify',
-                now()->addMinutes(60),
-                [
-                    'id' => $request->user()->getKey(),
-                    'hash' => sha1($request->user()->getEmailForVerification()),
-                ],
-                false,
+            $localVerificationUrl = $this->absoluteUrl(
+                URL::temporarySignedRoute(
+                    'verification.verify',
+                    now()->addMinutes(60),
+                    [
+                        'id' => $request->user()->getKey(),
+                        'hash' => sha1($request->user()->getEmailForVerification()),
+                    ],
+                    false,
+                ),
             );
         }
 
@@ -205,6 +207,11 @@ class AuthController extends Controller
         $reason = Str::limit(preg_replace('/\s+/', ' ', $exception->getMessage()), 220);
 
         return $prefix.' Detail SMTP: '.$reason;
+    }
+
+    private function absoluteUrl(string $path): string
+    {
+        return rtrim(config('app.url'), '/').'/'.ltrim($path, '/');
     }
 
     public function logout(Request $request)
