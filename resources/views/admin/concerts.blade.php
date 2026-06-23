@@ -35,7 +35,7 @@
                             <td>
                                 <div class="aspect-[4/1] w-32 overflow-hidden rounded-lg bg-neutral-100">
                                     @if($concert->poster)
-                                        <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="h-full w-full object-cover">
+                                        <img src="{{ $concert->poster_url }}" alt="{{ $concert->name }}" class="h-full w-full object-cover">
                                     @else
                                         <div class="grid h-full place-items-center text-xs font-bold text-neutral-400">No Poster</div>
                                     @endif

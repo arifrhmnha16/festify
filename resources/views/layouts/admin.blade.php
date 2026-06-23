@@ -25,7 +25,7 @@
         <aside class="border-b border-neutral-200 bg-white lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
             <div class="flex items-center justify-between px-5 py-5">
                 <a href="{{ route('admin.dashboard') }}" class="block h-12 w-40 overflow-hidden rounded-lg border border-neutral-200 bg-white" aria-label="Festify Admin">
-                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
+                    <img src="{{ asset('logofest.webp') }}" alt="Festify" class="h-full w-full object-cover object-center">
                 </a>
                 <form method="post" action="{{ route('logout') }}" class="lg:hidden">@csrf<button class="fi-btn-muted">Logout</button></form>
             </div>

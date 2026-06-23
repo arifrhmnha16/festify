@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Concert extends Model
 {
@@ -20,7 +20,19 @@ class Concert extends Model
             return null;
         }
 
-        $publicPoster = 'posters/'.basename($this->poster);
+        $basename = basename($this->poster);
+        $webpBasename = pathinfo($basename, PATHINFO_FILENAME).'.webp';
+        $publicWebpPoster = 'posters/'.$webpBasename;
+        $storageWebpPoster = 'posters/'.$webpBasename;
+        $publicPoster = 'posters/'.$basename;
+
+        if (is_file(public_path($publicWebpPoster))) {
+            return asset($publicWebpPoster);
+        }
+
+        if (Storage::disk('public')->exists($storageWebpPoster)) {
+            return asset('storage/'.$storageWebpPoster);
+        }
 
         if (is_file(public_path($publicPoster))) {
             return asset($publicPoster);

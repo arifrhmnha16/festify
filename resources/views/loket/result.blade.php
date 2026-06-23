@@ -58,7 +58,7 @@
 
                     <div class="flex flex-col justify-between border-r border-dashed border-neutral-300 p-4">
                         <div>
-                            <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-8 w-28 rounded-md object-cover object-center">
+                            <img src="{{ asset('logofest.webp') }}" alt="Festify" class="h-8 w-28 rounded-md object-cover object-center">
                             <p class="mt-2 text-[9px] font-black uppercase tracking-[0.2em] text-orange-700">Wristband</p>
                             <h2 class="mt-1.5 line-clamp-2 text-lg font-black leading-tight">{{ $ticket->concert->name }}</h2>
                             <p class="mt-1.5 line-clamp-1 text-[10px] text-neutral-600">{{ $ticket->concert->venue }} - {{ $ticket->concert->date->format('d M Y') }}</p>

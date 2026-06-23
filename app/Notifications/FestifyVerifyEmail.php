@@ -19,7 +19,7 @@ class FestifyVerifyEmail extends VerifyEmail
             ->view('emails.verify-email', [
                 'user' => $notifiable,
                 'url' => $url,
-                'logoUrl' => config('mail.logo_url') ?: asset('logofest.png'),
+                'logoUrl' => config('mail.logo_url') ?: asset('logofest.webp'),
             ]);
     }
 

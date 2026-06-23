@@ -22,7 +22,7 @@
         <div class="border-b border-neutral-200 p-6 md:p-8">
             <div class="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-10 w-36 rounded-md object-cover object-center">
+                    <img src="{{ asset('logofest.webp') }}" alt="Festify" class="h-10 w-36 rounded-md object-cover object-center">
                     <p class="mt-4 text-xs font-bold uppercase tracking-widest text-orange-700">E-Ticket</p>
                     <h1 class="mt-2 text-3xl font-black leading-tight md:text-4xl">{{ $ticket->concert->name }}</h1>
                     <p class="mt-2 text-neutral-600">{{ $ticket->user->name }} - {{ $ticket->concert->venue }}</p>

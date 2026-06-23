@@ -11,7 +11,7 @@
         <div class="mx-auto max-w-md">
             <div class="flex items-center justify-between gap-3">
                 <a href="{{ route('home') }}" class="block h-10 w-36 overflow-hidden rounded-md" aria-label="Festify">
-                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
+                    <img src="{{ asset('logofest.webp') }}" alt="Festify" class="h-full w-full object-cover object-center">
                 </a>
                 @auth
                     <p class="truncate text-right text-xs font-bold text-neutral-600">Halo, {{ auth()->user()->name }}</p>
@@ -19,9 +19,15 @@
                     <a href="{{ route('login') }}" class="rounded-full border border-neutral-300 px-4 py-2 text-xs font-bold">Login</a>
                 @endauth
             </div>
-            <form action="{{ route('concerts.index') }}" class="mt-3 grid grid-cols-[1fr_auto] gap-2 rounded-xl border border-neutral-200 bg-white p-2 shadow-sm">
-                <input name="q" value="{{ request('q') }}" class="min-w-0 rounded-lg border border-transparent bg-neutral-50 px-4 py-3 text-sm outline-none focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-200" placeholder="Cari konser atau artis">
-                <button class="rounded-lg bg-orange-700 px-5 py-3 text-sm font-black text-white hover:bg-orange-800">Cari</button>
+            <form action="{{ route('concerts.index') }}" class="mt-3 flex items-center rounded-xl bg-neutral-100 px-3 py-2.5 shadow-sm">
+                <input name="q" value="{{ request('q') }}" class="min-w-0 flex-1 bg-transparent text-sm font-semibold text-blue-950 outline-none placeholder:font-normal placeholder:text-neutral-500" placeholder="Cari konser">
+                <span class="mx-2 h-5 w-px bg-neutral-300"></span>
+                <input name="venue" value="{{ request('venue') }}" class="min-w-0 w-16 bg-transparent text-sm font-semibold text-blue-950 outline-none placeholder:font-normal placeholder:text-neutral-500" placeholder="Lokasi">
+                <span class="mx-2 h-5 w-px bg-neutral-300"></span>
+                <input type="date" name="date" value="{{ request('date') }}" class="w-[6.5rem] bg-transparent text-xs font-semibold text-blue-950 outline-none">
+                <button class="ml-2 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-orange-700 text-white hover:bg-orange-800" aria-label="Cari konser">
+                    <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                </button>
             </form>
         </div>
     </header>
@@ -30,7 +36,7 @@
         <div class="mx-auto max-w-6xl px-4 py-2.5">
             <div class="flex items-center justify-between gap-4">
                 <a href="{{ route('home') }}" class="block h-9 w-32 shrink-0 overflow-hidden rounded-md" aria-label="Festify">
-                    <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover object-center">
+                    <img src="{{ asset('logofest.webp') }}" alt="Festify" class="h-full w-full object-cover object-center">
                 </a>
                 <form action="{{ route('concerts.index') }}" class="hidden min-w-0 flex-1 items-center rounded-xl bg-neutral-100 px-3.5 py-2.5 lg:flex">
                     <input name="q" value="{{ request('q') }}" class="min-w-0 flex-1 bg-transparent text-sm font-semibold text-blue-950 outline-none placeholder:font-normal placeholder:text-neutral-500" placeholder="Cari event konser musik">
@@ -77,7 +83,7 @@
 
     <footer class="mt-12 border-t border-neutral-200 bg-white">
         <div class="mx-auto grid max-w-6xl gap-5 px-4 py-7 md:grid-cols-3">
-            <div><img src="{{ asset('logofest.png') }}" alt="Festify" class="h-10 w-36 rounded-md object-cover object-center"><p class="mt-3 text-sm text-neutral-600">Sistem e-ticket konser, penukaran gelang, dan validasi gate.</p></div>
+            <div><img src="{{ asset('logofest.webp') }}" alt="Festify" class="h-10 w-36 rounded-md object-cover object-center"><p class="mt-3 text-sm text-neutral-600">Sistem e-ticket konser, penukaran gelang, dan validasi gate.</p></div>
             <div class="text-sm text-neutral-600"><strong class="text-neutral-950">Kontak</strong><br>halo@festify.test<br>Jakarta, Indonesia</div>
             <div class="text-sm text-neutral-600"><strong class="text-neutral-950">Sosial</strong><br>Instagram / X / TikTok: @festify</div>
         </div>

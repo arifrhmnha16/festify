@@ -19,7 +19,7 @@ class FestifyResetPassword extends ResetPassword
             ->view('emails.reset-password', [
                 'user' => $notifiable,
                 'url' => $url,
-                'logoUrl' => config('mail.logo_url') ?: asset('logofest.png'),
+                'logoUrl' => config('mail.logo_url') ?: asset('logofest.webp'),
             ]);
     }
 }

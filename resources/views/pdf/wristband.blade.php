@@ -1,6 +1,6 @@
 @php
     $ticket = $wristband->eTicket;
-    $logo = \App\Support\PdfImage::containDataUri(public_path('logofest.png'), 184, 52, 62);
+    $logo = \App\Support\PdfImage::containDataUri(public_path('logofest.webp'), 184, 52, 62);
     $posterPath = null;
     if ($wristband->concert->poster) {
         $publicPoster = public_path('posters/'.basename($wristband->concert->poster));

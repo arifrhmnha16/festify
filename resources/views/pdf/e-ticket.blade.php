@@ -1,5 +1,5 @@
 @php
-    $logo = \App\Support\PdfImage::containDataUri(public_path('logofest.png'), 280, 78, 62);
+    $logo = \App\Support\PdfImage::containDataUri(public_path('logofest.webp'), 280, 78, 62);
     $posterPath = null;
     if ($ticket->concert->poster) {
         $publicPoster = public_path('posters/'.basename($ticket->concert->poster));

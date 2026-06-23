@@ -11,6 +11,7 @@ use App\Models\ScanHistory;
 use App\Models\TicketZone;
 use App\Models\User;
 use App\Models\Wristband;
+use App\Support\PosterImage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -533,7 +534,7 @@ class AdminController extends Controller
             if ($concert?->poster) {
                 Storage::disk('public')->delete($concert->poster);
             }
-            $data['poster'] = $request->file('poster')->store('posters', 'public');
+            $data['poster'] = PosterImage::storeWebp($request->file('poster'));
         } elseif ($concert) {
             unset($data['poster']);
         }

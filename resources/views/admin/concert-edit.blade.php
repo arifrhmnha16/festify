@@ -64,7 +64,7 @@
             <aside class="grid gap-4">
                 <div class="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
                     @if($concert->poster)
-                        <img src="{{ asset('storage/'.$concert->poster) }}" alt="{{ $concert->name }}" class="aspect-[4/1] w-full object-cover">
+                        <img src="{{ $concert->poster_url }}" alt="{{ $concert->name }}" class="aspect-[4/1] w-full object-cover">
                     @else
                         <div class="grid aspect-[4/1] place-items-center text-sm font-bold text-neutral-400">Belum ada poster</div>
                     @endif

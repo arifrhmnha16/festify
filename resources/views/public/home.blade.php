@@ -13,7 +13,7 @@
             <div class="flex transition-transform duration-500 ease-out" data-promo-track>
                 @forelse($bannerConcerts as $concert)
                     <article class="relative min-w-full">
-                        <div class="relative aspect-[3/1] overflow-hidden bg-neutral-950 md:aspect-[4/1]">
+                        <div class="relative aspect-[2.35/1] overflow-hidden bg-neutral-950 md:aspect-[4/1]">
                             <x-concert-poster :concert="$concert" class="h-full w-full object-cover" fallback-class="flex h-full items-end bg-[linear-gradient(135deg,#101322,#2c1f4f_48%,#da2b0d)] p-5 text-white md:p-8" />
                             @if($concert->is_promo)
                                 <span class="absolute left-4 top-4 z-20 rounded-md bg-red-600 px-3 py-1 text-xs font-black text-white shadow-sm md:left-6 md:top-6">Promo</span>
@@ -26,8 +26,8 @@
                     </article>
                 @empty
                     <article class="relative min-w-full">
-                        <div class="relative aspect-[3/1] overflow-hidden bg-neutral-950 md:aspect-[4/1]">
-                            <img src="{{ asset('logofest.png') }}" alt="Festify" class="h-full w-full object-cover opacity-80">
+                        <div class="relative aspect-[2.35/1] overflow-hidden bg-neutral-950 md:aspect-[4/1]">
+                            <img src="{{ asset('logofest.webp') }}" alt="Festify" class="h-full w-full object-cover opacity-80">
                             <a href="{{ route('concerts.index') }}" class="absolute bottom-3 left-1/2 z-20 flex w-[min(520px,calc(100%-3rem))] -translate-x-1/2 items-center justify-between gap-2 rounded-lg bg-white/80 px-3.5 py-2 text-xs font-black text-neutral-950 shadow-md backdrop-blur md:bottom-4 md:w-[min(500px,calc(100%-2rem))] md:px-3.5 md:py-2.5 md:text-xs">
                                 <span class="min-w-0 truncate">Festify <span class="text-blue-700">Beli tiketnya sekarang!</span></span>
                                 <svg class="h-5 w-5 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
