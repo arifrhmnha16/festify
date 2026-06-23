@@ -3,18 +3,21 @@
 <style>
     @media print {
         @page { size: 254mm 51mm; margin: 0; }
-        body { background: white !important; }
+        html, body { width: 254mm; height: 51mm; margin: 0 !important; padding: 0 !important; overflow: hidden; background: white !important; }
         body * { visibility: hidden; }
         #wristband-print, #wristband-print * { visibility: visible; }
         #wristband-print {
             position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+            left: 0;
+            top: 0;
+            width: 254mm !important;
+            height: 51mm !important;
             margin: 0;
             box-shadow: none !important;
             border: 1px solid #111 !important;
+            border-radius: 0 !important;
         }
+        #wristband-print > div { width: 100% !important; height: 100% !important; }
         .no-print { display: none !important; }
     }
 </style>
@@ -44,7 +47,7 @@
                     <div class="border-r border-dashed border-neutral-300 bg-neutral-900 p-2.5">
                         <div class="grid h-full place-items-center overflow-hidden rounded-md bg-neutral-950">
                             @if($ticket->concert->poster)
-                                <img src="{{ asset('storage/'.$ticket->concert->poster) }}" alt="{{ $ticket->concert->name }}" class="max-h-full max-w-full object-contain">
+                                <img src="{{ $ticket->concert->poster_url }}" alt="{{ $ticket->concert->name }}" class="max-h-full max-w-full object-contain">
                             @else
                                 <div class="flex h-full items-end bg-[linear-gradient(135deg,#111,#3f2a20)] p-3 text-white">
                                     <p class="text-xs font-black">{{ $ticket->concert->artist }}</p>

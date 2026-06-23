@@ -15,38 +15,38 @@
 <head>
     <meta charset="utf-8">
     <style>
-        @page { margin: 0; size: 254mm 51mm; }
+        @page { margin: 0; size: 720pt 144pt; }
         * { box-sizing: border-box; }
-        html, body { width: 254mm; height: 51mm; margin: 0; padding: 0; }
+        html, body { width: 720pt; height: 144pt; margin: 0; padding: 0; overflow: hidden; }
         body { font-family: Helvetica, Arial, sans-serif; color: #111; }
-        .band { width: 254mm; height: 51mm; border: 1.2pt solid #111; border-radius: 2mm; overflow: hidden; }
+        .band { width: 716pt; height: 140pt; margin: 2pt; border: 1pt solid #111; border-radius: 5pt; overflow: hidden; page-break-inside: avoid; }
         table { border-collapse: collapse; width: 100%; height: 100%; table-layout: fixed; }
-        td { vertical-align: middle; }
-        .side { width: 14mm; background: #050505; color: #fff; text-align: center; }
+        td { vertical-align: middle; height: 138pt; overflow: hidden; }
+        .side { width: 36pt; background: #050505; color: #fff; text-align: center; }
         .side-orange { background: #d92d00; }
-        .rotate { transform: rotate(-90deg); white-space: nowrap; font-size: 7pt; font-weight: 900; letter-spacing: 2.7pt; text-transform: uppercase; }
-        .poster-cell { width: 44mm; background: #171717; border-right: 0.8pt dashed #ccc; padding: 2.5mm; }
-        .poster-box { height: 45mm; background: #050505; border-radius: 1.8mm; text-align: center; overflow: hidden; }
+        .rotate { transform: rotate(-90deg); white-space: nowrap; font-size: 6.2pt; font-weight: 900; letter-spacing: 2.2pt; text-transform: uppercase; }
+        .poster-cell { width: 118pt; background: #171717; border-right: 0.7pt dashed #ccc; padding: 7pt; }
+        .poster-box { height: 124pt; background: #050505; border-radius: 5pt; text-align: center; overflow: hidden; }
         .poster-box img { width: 100%; height: 100%; object-fit: contain; }
-        .info { width: 72mm; border-right: 0.8pt dashed #ccc; padding: 3mm 4mm; }
-        .logo { width: 33mm; height: 9mm; object-fit: contain; }
-        .label { margin-top: 2mm; color: #c2410c; font-size: 7pt; font-weight: 900; letter-spacing: 1.5pt; text-transform: uppercase; }
-        h1 { margin: 1.5mm 0 0; font-size: 14pt; line-height: 1.06; font-weight: 900; }
-        .meta { margin-top: 1.2mm; color: #555; font-size: 7.5pt; white-space: nowrap; overflow: hidden; }
-        .mini { margin-top: 2mm; }
-        .mini div { display: inline-block; width: 23mm; border: 0.7pt solid #ddd; border-radius: 1.5mm; padding: 1.5mm; font-size: 6.5pt; }
-        .mini strong { display: block; margin-top: 0.5mm; font-size: 7pt; white-space: nowrap; overflow: hidden; }
-        .qr-cell { width: 39mm; border-right: 0.8pt dashed #ccc; background: #fafaf9; text-align: center; }
-        .qr-box { display: inline-block; background: white; padding: 2mm; border-radius: 1.5mm; }
-        .qr-box img { width: 27mm; height: 27mm; }
-        .qr-code { margin-top: 1.5mm; font-size: 6.5pt; font-family: Courier, monospace; font-weight: 900; }
-        .holder { width: 71mm; padding: 3.2mm 4mm; }
-        .holder-label { color: #c2410c; font-size: 7pt; font-weight: 900; letter-spacing: 2.2pt; text-transform: uppercase; }
-        .holder h2 { margin: 2.5mm 0 0; font-size: 14pt; font-weight: 900; white-space: nowrap; overflow: hidden; }
-        .ticket-code { margin-top: 2mm; font-size: 7.5pt; color: #555; font-family: Courier, monospace; }
-        .gate { margin-top: 3.5mm; background: #050505; color: white; border-radius: 2mm; padding: 2.6mm; }
-        .gate small { color: #fed7aa; text-transform: uppercase; letter-spacing: 1.5pt; font-size: 6.5pt; }
-        .gate p { margin: 1mm 0 0; font-size: 7.5pt; font-weight: 800; line-height: 1.25; }
+        .info { width: 190pt; border-right: 0.7pt dashed #ccc; padding: 8pt 10pt; }
+        .logo { width: 78pt; height: 22pt; object-fit: contain; }
+        .label { margin-top: 6pt; color: #c2410c; font-size: 6.2pt; font-weight: 900; letter-spacing: 1.4pt; text-transform: uppercase; }
+        h1 { margin: 4pt 0 0; font-size: 12.5pt; line-height: 1.03; font-weight: 900; max-height: 27pt; overflow: hidden; }
+        .meta { margin-top: 4pt; color: #555; font-size: 6.7pt; white-space: nowrap; overflow: hidden; }
+        .mini { margin-top: 7pt; white-space: nowrap; }
+        .mini div { display: inline-block; width: 58pt; border: 0.7pt solid #ddd; border-radius: 4pt; padding: 4pt; font-size: 5.7pt; overflow: hidden; }
+        .mini strong { display: block; margin-top: 2pt; font-size: 6.3pt; white-space: nowrap; overflow: hidden; }
+        .qr-cell { width: 112pt; border-right: 0.7pt dashed #ccc; background: #fafaf9; text-align: center; }
+        .qr-box { display: inline-block; background: white; padding: 6pt; border-radius: 5pt; }
+        .qr-box img { width: 78pt; height: 78pt; }
+        .qr-code { margin-top: 5pt; font-size: 6pt; font-family: Courier, monospace; font-weight: 900; }
+        .holder { width: 220pt; padding: 10pt 12pt; }
+        .holder-label { color: #c2410c; font-size: 6.2pt; font-weight: 900; letter-spacing: 2pt; text-transform: uppercase; }
+        .holder h2 { margin: 8pt 0 0; font-size: 13pt; font-weight: 900; white-space: nowrap; overflow: hidden; }
+        .ticket-code { margin-top: 8pt; font-size: 6.8pt; color: #555; font-family: Courier, monospace; }
+        .gate { margin-top: 9pt; background: #050505; color: white; border-radius: 5pt; padding: 8pt; width: 150pt; }
+        .gate small { color: #fed7aa; text-transform: uppercase; letter-spacing: 1.4pt; font-size: 5.8pt; }
+        .gate p { margin: 4pt 0 0; font-size: 6.8pt; font-weight: 800; line-height: 1.18; }
     </style>
 </head>
 <body>
