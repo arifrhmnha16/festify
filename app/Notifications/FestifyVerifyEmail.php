@@ -36,6 +36,7 @@ class FestifyVerifyEmail extends VerifyEmail
                 'id' => $notifiable->getKey(),
                 'hash' => sha1($notifiable->getEmailForVerification()),
             ],
+            false,
         );
     }
 }

@@ -32,6 +32,7 @@ class AuthController extends Controller
                     'id' => $request->user()->getKey(),
                     'hash' => sha1($request->user()->getEmailForVerification()),
                 ],
+                false,
             );
         }
 
