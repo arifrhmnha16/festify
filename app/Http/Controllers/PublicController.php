@@ -55,34 +55,60 @@ class PublicController extends Controller
     private function homeBannerItems($concerts, ?Concert $featuredConcert)
     {
         $settings = SiteSetting::homeBannerSettings();
+        $autoConcerts = $concerts->take(3)->values();
+        $autoIndex = 0;
+        $items = collect();
 
-        if ($settings['source'] === 'custom' && $settings['image_url']) {
-            return collect([[
-                'type' => 'custom',
-                'title' => $settings['title'] ?: 'Festify',
-                'image_url' => $settings['image_url'],
-                'url' => $settings['link'] ?: route('concerts.index'),
-                'is_promo' => false,
-            ]]);
-        }
+        foreach ($settings['slots'] as $slot) {
+            if ($slot['source'] === 'custom' && $slot['image_url']) {
+                $items->push([
+                    'type' => 'custom',
+                    'title' => $slot['title'] ?: 'Festify',
+                    'image_url' => $slot['image_url'],
+                    'url' => $slot['link'] ?: route('concerts.index'),
+                    'is_promo' => false,
+                ]);
 
-        if ($settings['source'] === 'concert' && $settings['concert_id']) {
-            $concert = Concert::where('status', 'aktif')->find($settings['concert_id']);
+                continue;
+            }
+
+            if ($slot['source'] === 'concert' && $slot['concert_id']) {
+                $concert = Concert::where('status', 'aktif')->find($slot['concert_id']);
+
+                if ($concert) {
+                    $items->push([
+                        'type' => 'concert',
+                        'title' => $concert->name,
+                        'concert' => $concert,
+                        'url' => route('concerts.show', $concert),
+                        'is_promo' => $concert->is_promo,
+                    ]);
+
+                    continue;
+                }
+            }
+
+            $concert = $autoConcerts->get($autoIndex);
+            $autoIndex++;
 
             if ($concert) {
-                return collect([[
+                $items->push([
                     'type' => 'concert',
                     'title' => $concert->name,
                     'concert' => $concert,
                     'url' => route('concerts.show', $concert),
                     'is_promo' => $concert->is_promo,
-                ]]);
+                ]);
             }
         }
 
-        $bannerConcerts = $concerts->take(4);
+        if ($items->isNotEmpty()) {
+            return $items->take(3);
+        }
+
+        $bannerConcerts = $concerts->take(3);
         if ($featuredConcert && ! $bannerConcerts->contains('id', $featuredConcert->id)) {
-            $bannerConcerts = collect([$featuredConcert])->merge($bannerConcerts)->take(4);
+            $bannerConcerts = collect([$featuredConcert])->merge($bannerConcerts)->take(3);
         }
 
         return $bannerConcerts->map(fn (Concert $concert) => [

@@ -65,36 +65,42 @@ class AdminController extends Controller
     public function updateBanner(Request $request)
     {
         $settings = SiteSetting::homeBannerSettings();
-        $rules = [
-            'source' => ['required', 'in:auto,custom,concert'],
-            'concert_id' => ['nullable', 'required_if:source,concert', 'exists:concerts,id'],
-            'banner' => ['nullable', 'image', 'dimensions:ratio=4/1', 'max:10240'],
-            'title' => ['nullable', 'string', 'max:150'],
-            'link' => ['nullable', 'string', 'max:2048'],
-        ];
+        $rules = [];
 
-        if ($request->input('source') === 'custom' && ! $request->hasFile('banner') && blank($settings['image'])) {
-            $rules['banner'][] = 'required';
+        foreach ($settings['slots'] as $position => $slot) {
+            $rules["slots.{$position}.source"] = ['required', 'in:auto,custom,concert'];
+            $rules["slots.{$position}.concert_id"] = ['nullable', 'required_if:slots.'.$position.'.source,concert', 'exists:concerts,id'];
+            $rules["slots.{$position}.banner"] = ['nullable', 'image', 'dimensions:ratio=4/1', 'max:10240'];
+            $rules["slots.{$position}.title"] = ['nullable', 'string', 'max:150'];
+            $rules["slots.{$position}.link"] = ['nullable', 'string', 'max:2048'];
+
+            if ($request->input("slots.{$position}.source") === 'custom' && ! $request->hasFile("slots.{$position}.banner") && blank($slot['image'])) {
+                $rules["slots.{$position}.banner"][] = 'required';
+            }
         }
 
         $data = $request->validate($rules);
-        $imagePath = $settings['image'];
 
-        if ($request->hasFile('banner')) {
-            if ($imagePath) {
-                Storage::disk('public')->delete($imagePath);
+        foreach ($settings['slots'] as $position => $slot) {
+            $slotData = $data['slots'][$position];
+            $imagePath = $slot['image'];
+
+            if ($request->hasFile("slots.{$position}.banner")) {
+                if ($imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+
+                $imagePath = PosterImage::storeWebp($request->file("slots.{$position}.banner"), 'banners');
             }
 
-            $imagePath = PosterImage::storeWebp($request->file('banner'), 'banners');
+            SiteSetting::putMany([
+                "home_banner_{$position}_source" => $slotData['source'],
+                "home_banner_{$position}_concert_id" => $slotData['source'] === 'concert' ? (string) $slotData['concert_id'] : null,
+                "home_banner_{$position}_image" => $imagePath,
+                "home_banner_{$position}_title" => $slotData['title'] ?? null,
+                "home_banner_{$position}_link" => $slotData['link'] ?? null,
+            ]);
         }
-
-        SiteSetting::putMany([
-            'home_banner_source' => $data['source'],
-            'home_banner_concert_id' => $data['source'] === 'concert' ? (string) $data['concert_id'] : null,
-            'home_banner_image' => $imagePath,
-            'home_banner_title' => $data['title'] ?? null,
-            'home_banner_link' => $data['link'] ?? null,
-        ]);
 
         return back()->with('success', 'Banner utama diperbarui.');
     }
