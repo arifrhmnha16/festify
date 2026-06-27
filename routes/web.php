@@ -62,6 +62,8 @@ Route::middleware(['role:user', 'verified'])->prefix('user')->name('user.')->gro
 
 Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/banner', [AdminController::class, 'editBanner'])->name('banner.edit');
+    Route::put('/banner', [AdminController::class, 'updateBanner'])->name('banner.update');
     Route::get('/concerts', [AdminController::class, 'concerts'])->name('concerts');
     Route::get('/concerts/create', [AdminController::class, 'createConcert'])->name('concerts.create');
     Route::post('/concerts', [AdminController::class, 'storeConcert'])->name('concerts.store');

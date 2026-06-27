@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Concert;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 
 class PublicController extends Controller
@@ -23,7 +24,9 @@ class PublicController extends Controller
             $concerts = collect([$featuredConcert])->merge($concerts)->take(3);
         }
 
-        return view('public.home', compact('concerts', 'featuredConcert', 'upcomingConcerts'));
+        $bannerItems = $this->homeBannerItems($concerts, $featuredConcert);
+
+        return view('public.home', compact('concerts', 'featuredConcert', 'upcomingConcerts', 'bannerItems'));
     }
 
     public function concerts(Request $request)
@@ -47,5 +50,47 @@ class PublicController extends Controller
             ->when($request->date, fn ($query, $date) => $query->whereDate('date', $date))
             ->orderByDesc('is_featured')
             ->latest('date');
+    }
+
+    private function homeBannerItems($concerts, ?Concert $featuredConcert)
+    {
+        $settings = SiteSetting::homeBannerSettings();
+
+        if ($settings['source'] === 'custom' && $settings['image_url']) {
+            return collect([[
+                'type' => 'custom',
+                'title' => $settings['title'] ?: 'Festify',
+                'image_url' => $settings['image_url'],
+                'url' => $settings['link'] ?: route('concerts.index'),
+                'is_promo' => false,
+            ]]);
+        }
+
+        if ($settings['source'] === 'concert' && $settings['concert_id']) {
+            $concert = Concert::where('status', 'aktif')->find($settings['concert_id']);
+
+            if ($concert) {
+                return collect([[
+                    'type' => 'concert',
+                    'title' => $concert->name,
+                    'concert' => $concert,
+                    'url' => route('concerts.show', $concert),
+                    'is_promo' => $concert->is_promo,
+                ]]);
+            }
+        }
+
+        $bannerConcerts = $concerts->take(4);
+        if ($featuredConcert && ! $bannerConcerts->contains('id', $featuredConcert->id)) {
+            $bannerConcerts = collect([$featuredConcert])->merge($bannerConcerts)->take(4);
+        }
+
+        return $bannerConcerts->map(fn (Concert $concert) => [
+            'type' => 'concert',
+            'title' => $concert->name,
+            'concert' => $concert,
+            'url' => route('concerts.show', $concert),
+            'is_promo' => $concert->is_promo,
+        ]);
     }
 }

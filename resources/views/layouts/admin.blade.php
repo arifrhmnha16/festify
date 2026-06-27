@@ -10,6 +10,7 @@
     @php
         $menus = [
             ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'D'],
+            ['route' => 'admin.banner.edit', 'label' => 'Banner', 'icon' => 'B'],
             ['route' => 'admin.concerts', 'label' => 'Konser', 'icon' => 'K'],
             ['route' => 'admin.users', 'label' => 'User', 'icon' => 'U'],
             ['route' => 'admin.officers', 'label' => 'Petugas', 'icon' => 'P'],

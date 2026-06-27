@@ -8,6 +8,7 @@ use App\Models\Officer;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\ScanHistory;
+use App\Models\SiteSetting;
 use App\Models\TicketZone;
 use App\Models\User;
 use App\Models\Wristband;
@@ -51,6 +52,51 @@ class AdminController extends Controller
         $concerts = Concert::latest()->paginate(10);
 
         return view('admin.concerts', compact('concerts'));
+    }
+
+    public function editBanner()
+    {
+        return view('admin.banner', [
+            'settings' => SiteSetting::homeBannerSettings(),
+            'concerts' => Concert::where('status', 'aktif')->latest('date')->get(),
+        ]);
+    }
+
+    public function updateBanner(Request $request)
+    {
+        $settings = SiteSetting::homeBannerSettings();
+        $rules = [
+            'source' => ['required', 'in:auto,custom,concert'],
+            'concert_id' => ['nullable', 'required_if:source,concert', 'exists:concerts,id'],
+            'banner' => ['nullable', 'image', 'dimensions:ratio=4/1', 'max:10240'],
+            'title' => ['nullable', 'string', 'max:150'],
+            'link' => ['nullable', 'string', 'max:2048'],
+        ];
+
+        if ($request->input('source') === 'custom' && ! $request->hasFile('banner') && blank($settings['image'])) {
+            $rules['banner'][] = 'required';
+        }
+
+        $data = $request->validate($rules);
+        $imagePath = $settings['image'];
+
+        if ($request->hasFile('banner')) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+
+            $imagePath = PosterImage::storeWebp($request->file('banner'), 'banners');
+        }
+
+        SiteSetting::putMany([
+            'home_banner_source' => $data['source'],
+            'home_banner_concert_id' => $data['source'] === 'concert' ? (string) $data['concert_id'] : null,
+            'home_banner_image' => $imagePath,
+            'home_banner_title' => $data['title'] ?? null,
+            'home_banner_link' => $data['link'] ?? null,
+        ]);
+
+        return back()->with('success', 'Banner utama diperbarui.');
     }
 
     public function createConcert()

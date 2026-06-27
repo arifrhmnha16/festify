@@ -1,25 +1,22 @@
 @extends('layouts.app', ['title' => 'Festify'])
 @section('content')
-@php
-    $bannerConcerts = $concerts->take(4);
-    if ($featuredConcert && ! $bannerConcerts->contains('id', $featuredConcert->id)) {
-        $bannerConcerts = collect([$featuredConcert])->merge($bannerConcerts)->take(4);
-    }
-@endphp
-
 <section class="bg-white">
     <div class="px-0 py-0">
         <div class="relative overflow-hidden border-y border-neutral-200 bg-neutral-950" data-promo-slider>
             <div class="flex transition-transform duration-500 ease-out" data-promo-track>
-                @forelse($bannerConcerts as $concert)
+                @forelse($bannerItems as $item)
                     <article class="relative min-w-full">
                         <div class="relative aspect-[2.35/1] overflow-hidden bg-neutral-950 md:aspect-[4/1]">
-                            <x-concert-poster :concert="$concert" class="h-full w-full object-cover" fallback-class="flex h-full items-end bg-[linear-gradient(135deg,#101322,#2c1f4f_48%,#da2b0d)] p-5 text-white md:p-8" />
-                            @if($concert->is_promo)
+                            @if($item['type'] === 'custom')
+                                <img src="{{ $item['image_url'] }}" alt="{{ $item['title'] }}" class="h-full w-full object-cover">
+                            @else
+                                <x-concert-poster :concert="$item['concert']" class="h-full w-full object-cover" fallback-class="flex h-full items-end bg-[linear-gradient(135deg,#101322,#2c1f4f_48%,#da2b0d)] p-5 text-white md:p-8" />
+                            @endif
+                            @if($item['is_promo'])
                                 <span class="absolute left-4 top-4 z-20 rounded-md bg-red-600 px-3 py-1 text-xs font-black text-white shadow-sm md:left-6 md:top-6">Promo</span>
                             @endif
-                            <a href="{{ route('concerts.show', $concert) }}" class="absolute bottom-3 left-1/2 z-20 flex w-[min(520px,calc(100%-3rem))] -translate-x-1/2 items-center justify-between gap-2 rounded-lg bg-white/80 px-3.5 py-2 text-xs font-black text-neutral-950 shadow-md backdrop-blur md:bottom-4 md:w-[min(500px,calc(100%-2rem))] md:px-3.5 md:py-2.5 md:text-xs">
-                                <span class="min-w-0 truncate">{{ $concert->name }} <span class="text-blue-700">Beli tiketnya sekarang!</span></span>
+                            <a href="{{ $item['url'] }}" class="absolute bottom-3 left-1/2 z-20 flex w-[min(520px,calc(100%-3rem))] -translate-x-1/2 items-center justify-between gap-2 rounded-lg bg-white/80 px-3.5 py-2 text-xs font-black text-neutral-950 shadow-md backdrop-blur md:bottom-4 md:w-[min(500px,calc(100%-2rem))] md:px-3.5 md:py-2.5 md:text-xs">
+                                <span class="min-w-0 truncate">{{ $item['title'] }} <span class="text-blue-700">Beli tiketnya sekarang!</span></span>
                                 <svg class="h-5 w-5 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                             </a>
                         </div>
@@ -37,7 +34,7 @@
                 @endforelse
             </div>
 
-            @if($bannerConcerts->count() > 1)
+            @if($bannerItems->count() > 1)
                 <button type="button" class="absolute left-3 top-1/2 z-30 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white text-neutral-900 shadow-md transition hover:scale-105 md:left-5 md:h-9 md:w-9" data-promo-prev aria-label="Slide sebelumnya">
                         <svg class="h-3.5 w-3.5 md:h-4 md:w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
@@ -45,7 +42,7 @@
                         <svg class="h-3.5 w-3.5 md:h-4 md:w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
                 </button>
                 <div class="absolute bottom-5 left-4 z-30 flex gap-1.5 md:bottom-7 md:left-10 md:gap-2" data-promo-dots>
-                    @foreach($bannerConcerts as $concert)
+                    @foreach($bannerItems as $item)
                         <button type="button" class="h-1.5 w-1.5 rounded-full bg-white/45 transition data-[active=true]:w-3 data-[active=true]:bg-white" data-promo-dot data-active="{{ $loop->first ? 'true' : 'false' }}" aria-label="Slide {{ $loop->iteration }}"></button>
                     @endforeach
                 </div>
